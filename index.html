@@ -201,26 +201,26 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <span class="kpi-badge up">+12% YoY</span>
     </div>
     <div class="kpi-lbl">Total Revenue</div>
-    <div class="kpi-val">₹4.40 Cr</div>
-    <div class="kpi-sub">₹4,39,55,732 lifetime</div>
+    <div class="kpi-val" id="kpi-revenue">—</div>
+    <div class="kpi-sub">All products combined</div>
   </div>
   <div class="kpi">
     <div class="kpi-top">
       <div class="kpi-ico" style="background:#d1fae5">📈</div>
-      <span class="kpi-badge up">+8% YoY</span>
+      <span class="kpi-badge up">Gross profit</span>
     </div>
     <div class="kpi-lbl">Gross Profit</div>
-    <div class="kpi-val">₹38.5 L</div>
-    <div class="kpi-sub">After stock procurement cost</div>
+    <div class="kpi-val" id="kpi-profit">—</div>
+    <div class="kpi-sub" id="kpi-profit-sub">After procurement cost</div>
   </div>
   <div class="kpi">
     <div class="kpi-top">
       <div class="kpi-ico" style="background:#fee2e2">💳</div>
-      <span class="kpi-badge down">1.96% of sale</span>
+      <span class="kpi-badge down" id="kpi-recv-sub">of sale</span>
     </div>
     <div class="kpi-lbl">Outstanding Dues</div>
-    <div class="kpi-val">₹8.61 L</div>
-    <div class="kpi-sub">Across 35+ customers</div>
+    <div class="kpi-val" id="kpi-recv">—</div>
+    <div class="kpi-sub">Across active customers</div>
   </div>
   <div class="kpi">
     <div class="kpi-top">
@@ -228,27 +228,23 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <span class="kpi-badge neutral">in hand</span>
     </div>
     <div class="kpi-lbl">Stock in Hand</div>
-    <div class="kpi-val">98</div>
+    <div class="kpi-val" id="kpi-stock">—</div>
     <div class="kpi-sub">19 kg cylinders available</div>
   </div>
   <div class="kpi">
     <div class="kpi-top">
       <div class="kpi-ico" style="background:#ede9fe">🛒</div>
-      <span class="kpi-badge neutral">269 refills</span>
+      <span class="kpi-badge neutral">all types</span>
     </div>
     <div class="kpi-lbl">Total Purchases</div>
-    <div class="kpi-val">₹3.82 Cr</div>
+    <div class="kpi-val" id="kpi-purchases">—</div>
     <div class="kpi-sub">Stock refill procurement</div>
   </div>
 </div>
 
 <!-- ══ DATA STATUS ══════════════════════════════════════════ -->
 <div class="dstat">
-  ✅ Data loaded —
-  <strong>25,649 cylinders sold</strong> &nbsp;|&nbsp;
-  <strong>361 customers</strong> &nbsp;|&nbsp;
-  <strong>~27 months</strong> of data &nbsp;|&nbsp;
-  exported: 2026-05-18 17:51:06
+  ✅ <span id="dstat-text">Loading data…</span>
 </div>
 
 <!-- ══ TAB NAV ══════════════════════════════════════════════ -->
@@ -258,6 +254,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   <button class="tab" onclick="switchTab('opex',this)">💸 OpEx</button>
   <button class="tab" onclick="switchTab('recv',this)">💳 Receivables</button>
   <button class="tab" onclick="switchTab('map',this)">🗺️ Map</button>
+  <span id="filter-range-note" style="margin-left:auto;align-self:center;font-size:11px;color:var(--txt3);padding-right:4px"></span>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -286,7 +283,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       </div>
       <div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--txt2)">
         <span>Total Outstanding</span>
-        <strong style="color:var(--red)">₹8,61,185</strong>
+        <strong id="recv-total-ov" style="color:var(--red)">—</strong>
       </div>
     </div>
   </div>
@@ -330,10 +327,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 ══════════════════════════════════════════════════════════════ -->
 <div class="panel" id="tab-opex">
   <div class="opex-kpis">
-    <div class="opex-kpi"><div class="olbl">Total Expenses</div><div class="oval">₹17,31,784</div></div>
-    <div class="opex-kpi"><div class="olbl">Cash Expense</div><div class="oval">₹4,28,095</div></div>
-    <div class="opex-kpi"><div class="olbl">Online Expense</div><div class="oval">₹13,03,689</div></div>
-    <div class="opex-kpi"><div class="olbl">Avg OpEx / Month</div><div class="oval">₹1,44,315</div></div>
+    <div class="opex-kpi"><div class="olbl">Total Expenses</div><div class="oval" id="opex-total">—</div></div>
+    <div class="opex-kpi"><div class="olbl">Cash Expense</div><div class="oval" id="opex-cash">—</div></div>
+    <div class="opex-kpi"><div class="olbl">Online Expense</div><div class="oval" id="opex-online">—</div></div>
+    <div class="opex-kpi"><div class="olbl">Avg OpEx / Month</div><div class="oval" id="opex-avg">—</div></div>
   </div>
   <div class="row2">
     <div class="cc">
@@ -371,15 +368,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <div class="cc">
         <div class="ct">Receivables % of Sale</div>
         <div class="cw" style="height:180px"><canvas id="c-rpct" role="img" aria-label="Gauge showing receivables as 1.96% of total sales">Receivables are 1.96% of total sales.</canvas></div>
-        <div style="text-align:center;font-size:26px;font-weight:800;color:var(--amber);margin-top:-16px">1.96%</div>
-        <div style="text-align:center;font-size:11px;color:var(--txt3);margin-top:3px">of ₹4.40 Cr total billed</div>
+        <div style="text-align:center;font-size:26px;font-weight:800;color:var(--amber);margin-top:-16px" id="recv-pct-val">—</div>
+        <div style="text-align:center;font-size:11px;color:var(--txt3);margin-top:3px">of 19 kg total billing</div>
       </div>
       <div class="cc">
         <div class="ct">Risk Breakdown</div>
         <div style="display:flex;flex-direction:column;gap:9px;margin-top:6px;font-size:12px">
-          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-red">High</span> &nbsp;> ₹50,000</span><strong>4 customers</strong></div>
-          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-or">Medium</span> &nbsp;₹10K – ₹50K</span><strong>8 customers</strong></div>
-          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-grn">Low</span> &nbsp;< ₹10,000</span><strong>23 customers</strong></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-red">High</span> &nbsp;> ₹50,000</span><strong id="risk-high">—</strong></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-or">Medium</span> &nbsp;₹10K – ₹50K</span><strong id="risk-med">—</strong></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-grn">Low</span> &nbsp;< ₹10,000</span><strong id="risk-low">—</strong></div>
         </div>
       </div>
     </div>
@@ -455,12 +452,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     DATA  —  Replace with: fetch('./data/gas_data.json')
-     once the export_gas_data.py script is running
-══════════════════════════════════════════════════════════════ -->
+<!-- Data loaded from data/gas_data.json -->
 <script>
-const D = {
+let D = null;
+const _PLACEHOLDER = {
   meta:{ agency:"Vikram HP Gas Agency", data_upto:"2026-05-18", exported_at:"2026-05-18 17:51:06" },
 
   monthly:[
@@ -538,19 +533,29 @@ const D = {
     {n:"Malewad",loc:"Malewad",lat:15.9200,lng:73.6700,cy:159,r:1200},
     {n:"Talavade",loc:"Talavade",lat:15.8300,lng:73.5800,cy:154,r:900}
   ]
-};
+}; // _PLACEHOLDER end (not used — real data comes from fetch below)
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 
-// ── Helpers ──────────────────────────────────────────────────
-const inr = n => '₹' + n.toLocaleString('en-IN');
+// ── Helpers ───────────────────────────────────────────────────
+const inr  = n => '₹' + Math.round(n).toLocaleString('en-IN');
 const inrL = n => '₹' + (n/100000).toFixed(1) + 'L';
 
 Chart.defaults.font = { family:"'Plus Jakarta Sans',sans-serif", size:11 };
 Chart.defaults.color = '#94a3b8';
+
+// ── Chart instance storage (needed for update on filter) ──────
+let chartMonthly, chartLoc, chartBvc, chartPay, chartOpex, chartRpct;
+
+// ── Month label → Date object for range comparison ────────────
+const MON = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function monthLabelToDate(label) {
+  const [m, y] = label.split('-');
+  return new Date(2000 + parseInt(y), MON[m] || 0, 1);
+}
 
 // ── Tab switching ─────────────────────────────────────────────
 function switchTab(id, btn) {
@@ -561,191 +566,258 @@ function switchTab(id, btn) {
   if (id === 'map' && !mapReady) initMap();
 }
 
-// ── Populate debtors overview ─────────────────────────────────
-(function(){
+// ── Populate tables ───────────────────────────────────────────
+function populateDebtorsOv(recv) {
   const tb = document.getElementById('tb-debtors-ov');
-  D.debtors.slice(0,10).forEach(d => {
-    const c = d.r > 50000 ? '#dc2626' : 'var(--txt)';
+  tb.innerHTML = '';
+  recv.slice(0,10).forEach(d => {
+    const c = d.receivable > 50000 ? '#dc2626' : 'var(--txt)';
     tb.innerHTML += `<tr>
-      <td>${d.c}</td>
-      <td style="text-align:right;font-weight:700;color:${c}">${inr(d.r)}</td>
+      <td>${d.customer}</td>
+      <td style="text-align:right;font-weight:700;color:${c}">${inr(d.receivable)}</td>
     </tr>`;
   });
-})();
+  const tot = recv.reduce((s,r) => s + r.receivable, 0);
+  document.querySelector('#tab-overview .kpi-val[data-recv]') && null;
+  document.getElementById('recv-total-ov').textContent = inr(tot);
+}
 
-// ── Populate receivables tab ──────────────────────────────────
-(function(){
+function populateRecvTab(recv) {
   const tb = document.getElementById('tb-recv');
-  D.debtors.forEach((d,i) => {
-    const risk = d.r > 50000
+  tb.innerHTML = '';
+  let high=0, med=0, low=0;
+  recv.forEach((d,i) => {
+    const risk = d.receivable > 50000
       ? '<span class="badge b-red">High</span>'
-      : d.r > 10000
+      : d.receivable > 10000
         ? '<span class="badge b-or">Medium</span>'
         : '<span class="badge b-grn">Low</span>';
+    if (d.receivable > 50000) high++;
+    else if (d.receivable > 10000) med++;
+    else low++;
     tb.innerHTML += `<tr>
       <td style="color:var(--txt3)">${i+1}</td>
-      <td><strong>${d.c}</strong></td>
-      <td>${d.loc}</td>
-      <td style="text-align:right;font-weight:700">${inr(d.r)}</td>
+      <td><strong>${d.customer}</strong></td>
+      <td>${d.location}</td>
+      <td style="text-align:right;font-weight:700">${inr(d.receivable)}</td>
       <td style="text-align:center">${risk}</td>
     </tr>`;
   });
-})();
+  document.getElementById('risk-high').textContent = high + ' customers';
+  document.getElementById('risk-med').textContent  = med  + ' customers';
+  document.getElementById('risk-low').textContent  = low  + ' customers';
+}
 
-// ── Populate sales summary ────────────────────────────────────
-(function(){
+function populateSalesTable(monthly) {
   const tb = document.getElementById('tb-sales');
-  D.monthly.slice(-14).forEach(m => {
-    const recv = Math.max(0, m.bill - m.coll);
+  tb.innerHTML = '';
+  monthly.slice(-14).forEach(m => {
+    const recv = Math.max(0, m.billing - m.collected);
     const sc = recv > 20000 ? '#dc2626' : recv > 5000 ? '#d97706' : '#059669';
     const badge = recv > 20000 ? '<span class="badge b-red">Due</span>'
       : recv > 0 ? '<span class="badge b-or">Partial</span>'
       : '<span class="badge b-grn">Cleared</span>';
     tb.innerHTML += `<tr>
-      <td><strong>${m.m}</strong></td>
-      <td style="text-align:right">${m.cy.toLocaleString()}</td>
-      <td style="text-align:right">${inr(m.bill)}</td>
-      <td style="text-align:right">${inr(m.coll)}</td>
+      <td><strong>${m.month}</strong></td>
+      <td style="text-align:right">${Math.round(m.cylinders).toLocaleString()}</td>
+      <td style="text-align:right">${inr(m.billing)}</td>
+      <td style="text-align:right">${inr(m.collected)}</td>
       <td style="text-align:right;font-weight:700;color:${sc}">${inr(recv)}</td>
       <td style="text-align:center">${badge}</td>
     </tr>`;
   });
-})();
+}
 
-// ── Populate opex table ───────────────────────────────────────
-(function(){
+function populateOpexTable(log) {
   const tb = document.getElementById('tb-opex');
-  D.opex.log.forEach(e => {
+  tb.innerHTML = '';
+  log.forEach(e => {
     tb.innerHTML += `<tr>
-      <td style="color:var(--txt3)">${e.d}</td>
-      <td><span class="badge b-blue">${e.cat}</span></td>
-      <td style="text-align:right;font-weight:700">${inr(e.v)}</td>
-      <td style="color:var(--txt3)">${e.note}</td>
+      <td style="color:var(--txt3)">${e.date}</td>
+      <td><span class="badge b-blue">${e.category}</span></td>
+      <td style="text-align:right;font-weight:700">${inr(e.total)}</td>
+      <td style="color:var(--txt3)">${e.notes}</td>
     </tr>`;
   });
-})();
+}
 
-// ── Chart: Monthly cylinders ──────────────────────────────────
-new Chart(document.getElementById('c-monthly'), {
-  type:'bar',
-  data:{
-    labels: D.monthly.map(m => m.m),
-    datasets:[{
-      label:'Cylinders Sold',
-      data: D.monthly.map(m => m.cy),
-      backgroundColor: D.monthly.map(m =>
-        m.m.includes('26') ? '#1d4ed8' : m.m.includes('25') ? '#60a5fa' : '#bfdbfe'
-      ),
-      borderRadius:4, borderSkipped:false
-    }]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c => `${c.parsed.y.toLocaleString()} cylinders` } } },
-    scales:{
-      x:{ grid:{display:false}, ticks:{ autoSkip:true, maxRotation:45, maxTicksLimit:20 } },
-      y:{ grid:{color:'#f1f5f9'}, beginAtZero:true }
-    }
+// ── KPI cards ─────────────────────────────────────────────────
+function renderKpis(kpis, monthly, recv) {
+  const totRecv  = recv.reduce((s,r) => s + r.receivable, 0);
+  const recvPct  = kpis.receivable_pct || (totRecv / kpis.revenue_19kg * 100).toFixed(2);
+  const netProfit = kpis.net_profit;
+
+  document.getElementById('kpi-revenue').textContent = inrL(kpis.total_revenue);
+  document.getElementById('kpi-profit').textContent  = inrL(kpis.gross_profit);
+  document.getElementById('kpi-recv').textContent    = inrL(totRecv);
+  document.getElementById('kpi-stock').textContent   = Math.round(kpis.stock_inhand_19kg).toLocaleString();
+  document.getElementById('kpi-purchases').textContent = inrL(kpis.total_cogs);
+  document.getElementById('kpi-recv-sub').textContent  = `${recvPct}% of 19 kg billing`;
+  document.getElementById('kpi-profit-sub').textContent = `Net: ${inrL(netProfit)} (${kpis.net_margin_pct}%)`;
+  document.getElementById('recv-pct-val').textContent   = recvPct + '%';
+
+  // Receivables gauge
+  const rp = parseFloat(recvPct);
+  if (chartRpct) {
+    chartRpct.data.datasets[0].data = [rp, Math.max(0, 100 - rp)];
+    chartRpct.update();
   }
-});
+}
 
-// ── Chart: Location horizontal bar ───────────────────────────
-new Chart(document.getElementById('c-loc'), {
-  type:'bar',
-  data:{
-    labels: D.locations.map(l => l.loc),
-    datasets:[{
-      label:'Cylinders',
-      data: D.locations.map(l => l.cy),
-      backgroundColor:'#3b82f6', borderRadius:3
-    }]
-  },
-  options:{
-    indexAxis:'y', responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c => `${c.parsed.x.toLocaleString()} cylinders` } } },
-    scales:{
-      x:{ grid:{color:'#f1f5f9'}, beginAtZero:true },
-      y:{ grid:{display:false} }
-    }
+// ── Charts ────────────────────────────────────────────────────
+function getMetricData(monthly, metric) {
+  if (metric === 'revenue') return monthly.map(m => m.billing);
+  if (metric === 'profit')  return monthly.map(m => Math.max(0, m.billing - m.collected));
+  return monthly.map(m => m.cylinders);
+}
+function getMetricLabel(metric) {
+  if (metric === 'revenue') return 'Billing (₹)';
+  if (metric === 'profit')  return 'Est. Receivable (₹)';
+  return 'Cylinders Sold';
+}
+function getMetricTooltip(metric) {
+  if (metric === 'revenue') return c => `${inr(c.parsed.y)}`;
+  if (metric === 'profit')  return c => `${inr(c.parsed.y)}`;
+  return c => `${Math.round(c.parsed.y).toLocaleString()} cylinders`;
+}
+
+function renderCharts(monthly, locationSales, opexCats, payMode) {
+  const metric = document.getElementById('metric-sel').value;
+
+  // ── Monthly bar ─────────────────────────────────────────────
+  const mLabels = monthly.map(m => m.month);
+  const mData   = getMetricData(monthly, metric);
+  const mColors = monthly.map(m =>
+    m.month.includes('26') ? '#1d4ed8' : m.month.includes('25') ? '#60a5fa' : '#bfdbfe'
+  );
+
+  if (chartMonthly) {
+    chartMonthly.data.labels = mLabels;
+    chartMonthly.data.datasets[0].data = mData;
+    chartMonthly.data.datasets[0].backgroundColor = mColors;
+    chartMonthly.data.datasets[0].label = getMetricLabel(metric);
+    chartMonthly.options.plugins.tooltip.callbacks.label = getMetricTooltip(metric);
+    chartMonthly.update();
+  } else {
+    chartMonthly = new Chart(document.getElementById('c-monthly'), {
+      type:'bar',
+      data:{ labels:mLabels, datasets:[{ label:getMetricLabel(metric), data:mData, backgroundColor:mColors, borderRadius:4, borderSkipped:false }] },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:getMetricTooltip(metric) } } },
+        scales:{ x:{ grid:{display:false}, ticks:{ autoSkip:true, maxRotation:45, maxTicksLimit:20 } }, y:{ grid:{color:'#f1f5f9'}, beginAtZero:true } }
+      }
+    });
   }
-});
 
-// ── Chart: Billing vs Collections ────────────────────────────
-new Chart(document.getElementById('c-bvc'), {
-  type:'bar',
-  data:{
-    labels: D.monthly.slice(-12).map(m => m.m),
-    datasets:[
-      { label:'Billing', data:D.monthly.slice(-12).map(m => m.bill), backgroundColor:'#3b82f6', borderRadius:3 },
-      { label:'Collected', data:D.monthly.slice(-12).map(m => m.coll), backgroundColor:'#f97316', borderRadius:3 }
-    ]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c => `${c.dataset.label}: ${inr(c.parsed.y)}` } } },
-    scales:{
-      x:{ grid:{display:false}, ticks:{maxRotation:45} },
-      y:{ grid:{color:'#f1f5f9'}, ticks:{ callback:v => inrL(v) } }
-    }
+  // ── Location bar ────────────────────────────────────────────
+  const selectedLoc = document.getElementById('loc-filter').value;
+  const locData  = locationSales.map(l => l.cylinders);
+  const locColors = locationSales.map(l =>
+    selectedLoc === 'all' || l.location === selectedLoc ? '#3b82f6' : '#bfdbfe'
+  );
+
+  if (chartLoc) {
+    chartLoc.data.labels = locationSales.map(l => l.location);
+    chartLoc.data.datasets[0].data = locData;
+    chartLoc.data.datasets[0].backgroundColor = locColors;
+    chartLoc.update();
+  } else {
+    chartLoc = new Chart(document.getElementById('c-loc'), {
+      type:'bar',
+      data:{ labels:locationSales.map(l => l.location), datasets:[{ label:'Cylinders', data:locData, backgroundColor:locColors, borderRadius:3 }] },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c => `${Math.round(c.parsed.x).toLocaleString()} cylinders` } } },
+        scales:{ x:{ grid:{color:'#f1f5f9'}, beginAtZero:true }, y:{ grid:{display:false} } }
+      }
+    });
   }
-});
 
-// ── Chart: Payment mode donut ─────────────────────────────────
-new Chart(document.getElementById('c-pay'), {
-  type:'doughnut',
-  data:{
-    labels:['Cash','Online'],
-    datasets:[{ data:[18500,7149], backgroundColor:['#3b82f6','#f97316'], borderWidth:0, hoverOffset:8 }]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false, cutout:'65%',
-    plugins:{
-      legend:{ position:'bottom', labels:{ usePointStyle:true, pointStyle:'rect', boxWidth:10, padding:14 } },
-      tooltip:{ callbacks:{ label:c => `${c.label}: ${c.parsed.toLocaleString()} txns` } }
-    }
+  // ── Billing vs Collections (last 12 filtered months) ────────
+  const bvcSlice = monthly.slice(-12);
+  if (chartBvc) {
+    chartBvc.data.labels = bvcSlice.map(m => m.month);
+    chartBvc.data.datasets[0].data = bvcSlice.map(m => m.billing);
+    chartBvc.data.datasets[1].data = bvcSlice.map(m => m.collected);
+    chartBvc.update();
+  } else {
+    chartBvc = new Chart(document.getElementById('c-bvc'), {
+      type:'bar',
+      data:{ labels:bvcSlice.map(m => m.month), datasets:[
+        { label:'Billing',   data:bvcSlice.map(m => m.billing),   backgroundColor:'#3b82f6', borderRadius:3 },
+        { label:'Collected', data:bvcSlice.map(m => m.collected), backgroundColor:'#f97316', borderRadius:3 }
+      ]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c => `${c.dataset.label}: ${inr(c.parsed.y)}` } } },
+        scales:{ x:{ grid:{display:false}, ticks:{maxRotation:45} }, y:{ grid:{color:'#f1f5f9'}, ticks:{ callback:v => inrL(v) } } }
+      }
+    });
   }
-});
 
-// ── Chart: OpEx pie ───────────────────────────────────────────
-const OPEX_COLORS = ['#3b82f6','#f97316','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#a78bfa','#fb923c','#34d399'];
-const opexLeg = document.getElementById('opex-leg');
-D.opex.cats.forEach((c,i) => {
-  opexLeg.innerHTML += `<span style="display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--txt2)">
-    <span style="width:9px;height:9px;border-radius:2px;background:${OPEX_COLORS[i]};display:inline-block"></span>
-    ${c.n} ${c.p}%
-  </span>`;
-});
-
-new Chart(document.getElementById('c-opex'), {
-  type:'doughnut',
-  data:{
-    labels: D.opex.cats.map(c => c.n),
-    datasets:[{ data:D.opex.cats.map(c => c.v), backgroundColor:OPEX_COLORS, borderWidth:0, hoverOffset:8 }]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false, cutout:'55%',
-    plugins:{
-      legend:{display:false},
-      tooltip:{ callbacks:{ label:c => `${c.label}: ${inr(c.parsed)} (${D.opex.cats[c.dataIndex].p}%)` } }
-    }
+  // ── Payment mode donut ───────────────────────────────────────
+  const pmData = [payMode.cash || 0, payMode.online || 0, payMode.both || 0];
+  if (chartPay) {
+    chartPay.data.datasets[0].data = pmData;
+    chartPay.update();
+  } else {
+    chartPay = new Chart(document.getElementById('c-pay'), {
+      type:'doughnut',
+      data:{ labels:['Cash','Online','Both'], datasets:[{ data:pmData, backgroundColor:['#3b82f6','#f97316','#10b981'], borderWidth:0, hoverOffset:8 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'65%',
+        plugins:{
+          legend:{ position:'bottom', labels:{ usePointStyle:true, pointStyle:'rect', boxWidth:10, padding:14 } },
+          tooltip:{ callbacks:{ label:c => `${c.label}: ${c.parsed.toLocaleString()} txns` } }
+        }
+      }
+    });
   }
-});
 
-// ── Chart: Receivables gauge ──────────────────────────────────
-new Chart(document.getElementById('c-rpct'), {
-  type:'doughnut',
-  data:{
-    labels:['Outstanding','Collected'],
-    datasets:[{ data:[1.96,98.04], backgroundColor:['#f97316','#e2e8f0'], borderWidth:0 }]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    circumference:180, rotation:-90, cutout:'75%',
-    plugins:{ legend:{display:false}, tooltip:{enabled:false} }
+  // ── OpEx donut ───────────────────────────────────────────────
+  const OPEX_COLORS = ['#3b82f6','#f97316','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#a78bfa','#fb923c','#34d399'];
+  const opexLeg = document.getElementById('opex-leg');
+  opexLeg.innerHTML = '';
+  opexCats.forEach((c,i) => {
+    opexLeg.innerHTML += `<span style="display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--txt2)">
+      <span style="width:9px;height:9px;border-radius:2px;background:${OPEX_COLORS[i%OPEX_COLORS.length]};display:inline-block"></span>
+      ${c.category} ${c.pct}%
+    </span>`;
+  });
+
+  if (chartOpex) {
+    chartOpex.data.labels = opexCats.map(c => c.category);
+    chartOpex.data.datasets[0].data = opexCats.map(c => c.total);
+    chartOpex.update();
+  } else {
+    chartOpex = new Chart(document.getElementById('c-opex'), {
+      type:'doughnut',
+      data:{ labels:opexCats.map(c => c.category), datasets:[{ data:opexCats.map(c => c.total), backgroundColor:OPEX_COLORS, borderWidth:0, hoverOffset:8 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'55%',
+        plugins:{
+          legend:{display:false},
+          tooltip:{ callbacks:{ label:c => `${c.label}: ${inr(c.parsed)} (${opexCats[c.dataIndex].pct}%)` } }
+        }
+      }
+    });
   }
-});
 
-// ── MAP (Leaflet + OpenStreetMap — completely free) ───────────
+  // ── Receivables gauge (created once in renderKpis) ───────────
+  if (!chartRpct) {
+    chartRpct = new Chart(document.getElementById('c-rpct'), {
+      type:'doughnut',
+      data:{ labels:['Outstanding','Collected'], datasets:[{ data:[2, 98], backgroundColor:['#f97316','#e2e8f0'], borderWidth:0 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false, circumference:180, rotation:-90, cutout:'75%',
+        plugins:{ legend:{display:false}, tooltip:{enabled:false} }
+      }
+    });
+  }
+}
+
+// ── MAP ───────────────────────────────────────────────────────
 let mapReady = false;
 function initMap() {
   mapReady = true;
@@ -755,82 +827,169 @@ function initMap() {
     maxZoom:18
   }).addTo(map);
 
-  D.map_pts.forEach(p => {
-    const radius = Math.max(9, Math.min(36, p.cy / 120));
-    const color  = p.r > 100000 ? '#dc2626' : p.r > 20000 ? '#f97316' : '#3b82f6';
+  (D.map_points || []).forEach(p => {
+    const cy = p.cylinders || 0;
+    const recv = p.receivable || 0;
+    const radius = p.type === 'location_cluster'
+      ? Math.max(9, Math.min(36, cy / 120))
+      : 7;
+    const color = recv > 100000 ? '#dc2626' : recv > 20000 ? '#f97316' : '#3b82f6';
 
     L.circleMarker([p.lat, p.lng], {
       radius, fillColor:color, color:'#fff', weight:2, opacity:1, fillOpacity:.82
     })
     .addTo(map)
     .bindPopup(`<div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:165px;font-size:12px">
-      <strong style="font-size:13px">${p.n}</strong><br>
-      <span style="color:#64748b">${p.loc}</span>
+      <strong style="font-size:13px">${p.name}</strong><br>
+      <span style="color:#64748b">${p.location}</span>
       <div style="margin-top:8px">
-        <div>🛢️ <strong>${p.cy.toLocaleString()}</strong> cylinders sold</div>
-        <div style="color:${p.r>50000?'#dc2626':'#059669'}">
-          💳 ${inr(p.r)} receivable
-        </div>
+        ${cy ? `<div>🛢️ <strong>${cy.toLocaleString()}</strong> cylinders sold</div>` : ''}
+        <div style="color:${recv>50000?'#dc2626':'#059669'}">💳 ${inr(recv)} receivable</div>
       </div>
     </div>`, { closeButton:false });
   });
 }
 
-// ── Filters (stub — wire to JSON reload once export script ready) ──
+// ── applyFilters — actually works now ─────────────────────────
 function applyFilters() {
-  console.log('Filters:', {
-    from: document.getElementById('d-from').value,
-    to:   document.getElementById('d-to').value,
-    loc:  document.getElementById('loc-filter').value,
-    metric: document.getElementById('metric-sel').value
+  if (!D) return;
+
+  const fromVal = document.getElementById('d-from').value;
+  const toVal   = document.getElementById('d-to').value;
+  const loc     = document.getElementById('loc-filter').value;
+  const metric  = document.getElementById('metric-sel').value;
+
+  const fromDate = fromVal ? new Date(fromVal) : null;
+  const toDate   = toVal   ? new Date(toVal)   : null;
+
+  // Filter monthly_sales by date range
+  const filteredMonthly = (D.monthly_sales || []).filter(m => {
+    const d = monthLabelToDate(m.month);
+    if (fromDate && d < fromDate) return false;
+    if (toDate   && d > toDate)   return false;
+    return true;
   });
-  // TODO: re-slice D.monthly by date range, re-filter D.locations by loc, re-render charts
+
+  // Filter receivables by location
+  const filteredRecv = loc === 'all'
+    ? (D.receivables || [])
+    : (D.receivables || []).filter(r => r.location === loc);
+
+  // Filter location sales (highlight selected in chart via renderCharts)
+  const filteredLocSales = loc === 'all'
+    ? (D.location_sales || [])
+    : (D.location_sales || []).filter(l => l.location === loc);
+
+  renderCharts(filteredMonthly, D.location_sales, D.opex_cats || [], D.payment_mode || {});
+  populateSalesTable(filteredMonthly);
+  populateDebtorsOv(filteredRecv);
+  populateRecvTab(filteredRecv);
+  renderKpis(D.kpis, filteredMonthly, filteredRecv);
+
+  // Update data-stat bar
+  if (filteredMonthly.length > 0) {
+    const first = filteredMonthly[0].month;
+    const last  = filteredMonthly[filteredMonthly.length-1].month;
+    document.getElementById('filter-range-note').textContent =
+      `Showing ${filteredMonthly.length} months: ${first} – ${last}` +
+      (loc !== 'all' ? ` · ${loc}` : '');
+  }
 }
+
+// ── Master render — called once after fetch ───────────────────
+function initDashboard(data) {
+  D = data;
+
+  // Status bar
+  document.querySelector('.sdate').textContent = D.meta.data_upto || '—';
+  document.getElementById('exp-time').textContent = D.meta.exported_at || '—';
+
+  // Set date filter defaults to full data range
+  if (D.meta.data_from) document.getElementById('d-from').value = D.meta.data_from;
+  if (D.meta.data_upto) document.getElementById('d-to').value   = D.meta.data_upto;
+
+  // Populate location dropdown from actual data
+  const locSel = document.getElementById('loc-filter');
+  locSel.innerHTML = '<option value="all">📍 All Locations</option>';
+  (D.location_sales || []).forEach(l => {
+    locSel.innerHTML += `<option value="${l.location}">${l.location}</option>`;
+  });
+
+  // Charts and tables (full dataset on load)
+  renderCharts(D.monthly_sales, D.location_sales, D.opex_cats || [], D.payment_mode || {});
+  populateSalesTable(D.monthly_sales);
+  populateDebtorsOv(D.receivables || []);
+  populateRecvTab(D.receivables || []);
+  populateOpexTable((D.opex_log || []).slice(0, 50));
+  renderKpis(D.kpis, D.monthly_sales, D.receivables || []);
+
+  // OpEx KPI cards
+  const opexTotal = D.kpis.opex_total || 0;
+  const opexMonths = (D.opex_monthly || []).length || 1;
+  document.getElementById('opex-total').textContent  = inr(opexTotal);
+  document.getElementById('opex-cash').textContent   = inr((D.opex_cats||[]).reduce((s,c)=>s+c.cash,0));
+  document.getElementById('opex-online').textContent = inr((D.opex_cats||[]).reduce((s,c)=>s+c.online,0));
+  document.getElementById('opex-avg').textContent    = inr(opexTotal / opexMonths);
+
+  // Data stat
+  document.getElementById('dstat-text').textContent =
+    `${Math.round(D.kpis.total_cylinders_sold).toLocaleString()} cylinders sold  |  ` +
+    `${D.meta.customers} customers  |  ` +
+    `${(D.monthly_sales||[]).length} months of data  |  exported: ${D.meta.exported_at}`;
+}
+
+// ── Fetch gas_data.json ───────────────────────────────────────
+fetch('./data/gas_data.json')
+  .then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  })
+  .then(data => initDashboard(data))
+  .catch(err => {
+    document.getElementById('dstat-text').textContent =
+      '⚠️ Could not load gas_data.json — ' + err.message;
+    console.error('Data load error:', err);
+  });
 
 // ──────────────────────────────────────────────────────────────
 //  AI SIDEBAR
 // ──────────────────────────────────────────────────────────────
 
-// ── Context builder — gas agency specific system prompt ───────
 function buildContext() {
-  const totCy  = D.monthly.reduce((s,m) => s + m.cy, 0);
-  const totBill = D.monthly.reduce((s,m) => s + m.bill, 0);
-  const last3  = D.monthly.slice(-3).map(m => `${m.m}: ${m.cy} cy, ${inr(m.bill)}`).join(' | ');
-  const topLoc  = D.locations[0];
-  const topDebt = D.debtors[0];
+  if (!D) return '';
+  const k = D.kpis;
+  const last3 = (D.monthly_sales||[]).slice(-3)
+    .map(m => `${m.month}: ${Math.round(m.cylinders)} cy, ${inr(m.billing)}`).join(' | ');
+  const topLoc  = (D.location_sales||[])[0] || {};
+  const topDebt = (D.receivables||[])[0] || {};
 
-  return `You are a business intelligence assistant for Vikram HP Gas Agency, a 19kg commercial LPG cylinder distributor in the Konkan region of Maharashtra and Goa, India.
+  return `You are a business intelligence assistant for Vikram HP Gas Agency, a commercial LPG cylinder distributor in the Konkan region of Maharashtra and Goa, India.
 
-LIVE DATA SNAPSHOT:
-- Total cylinders sold (all time): ${totCy.toLocaleString()}
-- Total billing: ${inr(totBill)}
-- Outstanding receivables: ₹8,61,185 (1.96% of sales)
-- Stock in hand: ~98 cylinders
-- Top sales location: ${topLoc.loc} (${topLoc.cy} cylinders)
-- Highest debtor: ${topDebt.c}, ${topDebt.loc} — ${inr(topDebt.r)}
+LIVE DATA SNAPSHOT (from gas_data.json exported ${D.meta.exported_at}):
+- Total revenue: ${inr(k.total_revenue)} (19kg: ${inr(k.revenue_19kg)}, 5kg: ${inr(k.revenue_5kg)}, 35kg: ${inr(k.revenue_35kg)})
+- Gross profit: ${inr(k.gross_profit)} (${k.gross_margin_pct}%) | Net profit: ${inr(k.net_profit)} (${k.net_margin_pct}%)
+- Total cylinders sold (19kg): ${Math.round(k.total_cylinders_sold).toLocaleString()}
+- Avg realised margin per 19kg cylinder: ₹${k.avg_margin_per_19kg}
+- Outstanding receivables: ${inr(k.total_receivable)} (${k.receivable_pct}% of 19kg billing)
+- Stock in hand (19kg): ${Math.round(k.stock_inhand_19kg)} cylinders
+- Total OpEx: ${inr(k.opex_total)}
+- Top location: ${topLoc.location} (${(topLoc.cylinders||0).toLocaleString()} cylinders)
+- Highest debtor: ${topDebt.customer}, ${topDebt.location} — ${inr(topDebt.receivable||0)}
 - Last 3 months: ${last3}
-- OpEx (2025 onwards): ₹17,31,784 total; Vehicle EMI is largest at 40.55%
-- Data period: Feb 2024 – May 2026
+- Data period: ${D.meta.data_from} to ${D.meta.data_upto}
 
 BUSINESS CONTEXT:
-The agency sells only 19kg commercial LPG cylinders to hotels, restaurants, and commercial establishments. Cylinders are procured from HP Gas (GOA LPG Plant). The MRP per cylinder is ₹1,770. Delivery routes cover Vengurla, Goa border area, Sawantwadi, and surrounding villages in Sindhudurg district.
+Products: 19kg commercial LPG (main), 5kg, 35kg cylinders. Procured from HP Gas (GOA LPG Plant). Customers are hotels, restaurants, commercial establishments in Vengurla, Sawantwadi, Goa border area, and surrounding Sindhudurg villages. MRP varies by cylinder type and period.
 
-Answer concisely in the context of this gas distribution business. Use ₹ and Indian number formatting. When asked about trends, cite specific months and numbers from the data.`;
+Answer concisely. Use ₹ and Indian number formatting (Lakhs/Crores). Cite specific months and numbers.`;
 }
 
-// ── Gas-specific helper functions (used once API is connected) ─
 const gasHelpers = {
-  topDebtors: (n=5) => D.debtors.slice(0,n).map(d => `${d.c} (${d.loc}): ${inr(d.r)}`),
-  bestLocation: () => D.locations[0],
-  recentTrend: (n=6) => D.monthly.slice(-n),
-  stockStatus: () => ({ in_hand: 98, note: 'Based on cumulative purchases minus sales' }),
-  avgMargin: () => '₹87.5 per cylinder (estimated from Stock_Refill data)',
-  monthlyBillingVsCollection: (n=3) => D.monthly.slice(-n).map(m => ({
-    month: m.m,
-    billed: m.bill,
-    collected: m.coll,
-    gap: m.bill - m.coll
-  }))
+  topDebtors: (n=5) => (D.receivables||[]).slice(0,n).map(d => `${d.customer} (${d.location}): ${inr(d.receivable)}`),
+  bestLocation: () => (D.location_sales||[])[0],
+  recentTrend: (n=6) => (D.monthly_sales||[]).slice(-n),
+  stockStatus: () => ({ in_hand: D.kpis.stock_inhand_19kg, note:'19kg only' }),
+  avgMargin: () => `₹${D.kpis.avg_margin_per_19kg} per 19kg cylinder (realised)`,
 };
 
 // ── Chat UI ───────────────────────────────────────────────────
@@ -895,7 +1054,7 @@ async function aiSend() {
   addMsg(
     `<em style="color:#94a3b8">API key not configured yet.</em><br><br>
     Your question <strong>"${q}"</strong> will be answered by Claude once you add your key to <code>config.js</code>.<br><br>
-    <span style="font-size:11.5px;color:#94a3b8">The AI will use live data from gas_data.json including your ${D.monthly.length} months of sales, ${D.debtors.length} debtor records, and full OpEx log.</span>`,
+    <span style="font-size:11.5px;color:#94a3b8">The AI will use live data from gas_data.json including your ${(D&&D.monthly_sales||[]).length} months of sales, ${(D&&D.receivables||[]).length} debtor records, and full OpEx log.</span>`,
     'ai'
   );
 }
