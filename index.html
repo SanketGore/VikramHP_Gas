@@ -4,525 +4,512 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vikram HP Gas Agency — Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script>
-if(typeof Chart==='undefined'){var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js';document.head.appendChild(s);}
-</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#f4f7fc;--card:#fff;--border:#e4eaf3;
-  --text:#0f1c2e;--dim:#7a8ca0;--accent:#1a56db;
-  --blue:#2563eb;--green:#10b981;--orange:#f59e0b;
-  --red:#ef4444;--purple:#7c3aed;--teal:#06b6d4;
-  --card-r:10px;--shadow:0 1px 3px rgba(15,28,46,.06),0 4px 16px rgba(15,28,46,.04);
-  --blue-pale:#eff6ff;
+:root {
+  --primary:#1d4ed8; --primary-h:#1e40af; --primary-lt:#dbeafe;
+  --accent:#ea580c; --accent-lt:#ffedd5;
+  --bg:#f1f5f9; --card:#ffffff; --border:#e2e8f0;
+  --txt:#0f172a; --txt2:#475569; --txt3:#94a3b8;
+  --green:#059669; --green-lt:#d1fae5;
+  --red:#dc2626; --red-lt:#fee2e2;
+  --amber:#d97706; --amber-lt:#fef3c7;
+  --purple:#7c3aed; --purple-lt:#ede9fe;
+  --radius:8px; --radius-lg:12px;
+  --shadow:0 1px 4px rgba(0,0,0,.07);
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:13px;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);font-size:13px;line-height:1.5}
 
-/* ── TOP BAR ── */
-.top-bar{background:var(--card);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow);}
-.top-bar h1{font-size:15px;font-weight:700;color:var(--accent);white-space:nowrap;}
-.spacer{flex:1;}
-#filter-toggle{display:none;padding:5px 10px;font-size:12px;font-weight:600;background:var(--bg);border:1px solid var(--border);border-radius:5px;cursor:pointer;color:var(--accent);}
-.filter-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;}
-.filter-row label{font-size:11px;font-weight:600;color:var(--dim);}
-.filter-row input,.filter-row select{font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text);font-weight:500;}
-.filter-row input[type=date]{width:120px;}
-
-/* ── CHECKBOX DROPDOWN (cd) ── */
-.cd-wrap{position:relative;display:inline-block;}
-.cd-btn{padding:4px 10px 4px 8px;font-size:12px;font-family:inherit;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:4px;color:var(--text);cursor:pointer;white-space:nowrap;min-width:130px;display:flex;align-items:center;justify-content:space-between;gap:6px;transition:border-color .15s;}
-.cd-btn:hover,.cd-btn.open{border-color:var(--blue);color:var(--blue);}
-.cd-arrow{font-size:9px;flex-shrink:0;}
-.cd-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:210px;max-width:280px;background:var(--card);border:1px solid var(--border);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:500;padding:6px 0;}
-.cd-panel.open{display:block;}
-.cd-search{width:100%;border:none;border-bottom:1px solid var(--border);padding:7px 10px;font-size:12px;font-family:inherit;outline:none;background:#fafafa;color:var(--text);}
-.cd-list{max-height:210px;overflow-y:auto;padding:4px 0;}
-.cd-item{display:flex;align-items:center;gap:8px;padding:5px 12px;font-size:12px;cursor:pointer;transition:background .1s;}
-.cd-item:hover{background:var(--bg);}
-.cd-item input[type=checkbox]{width:13px;height:13px;cursor:pointer;accent-color:var(--blue);flex-shrink:0;}
-.cd-divider{border:none;border-top:1px solid var(--border);margin:4px 0;}
-.cd-actions{display:flex;gap:4px;padding:6px 10px 4px;}
-.cd-actions button{flex:1;padding:4px 0;font-size:11px;font-weight:600;border:1px solid var(--border);border-radius:3px;cursor:pointer;background:var(--bg);color:var(--dim);transition:all .1s;}
-.cd-actions button:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
-.cd-count{background:var(--blue);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:1px 6px;margin-left:2px;}
-
-/* ── BUTTONS ── */
-.btn{padding:5px 12px;border:none;border-radius:5px;font-weight:600;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit;}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--dim);}
-.btn-outline:hover{background:var(--bg);}
-.btn-purple{background:var(--purple);color:#fff;}
-.btn-purple:hover{opacity:.85;}
+/* ── HEADER ── */
+.hdr{background:var(--card);border-bottom:1px solid var(--border);padding:8px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:7px;margin-right:4px}
+.brand h1{font-size:14px;font-weight:800;white-space:nowrap;letter-spacing:-.2px}
+.vdiv{width:1px;height:22px;background:var(--border)}
+.hdr-filter{display:flex;flex-direction:column;gap:1px}
+.hdr-lbl{font-size:10px;color:var(--txt3);font-weight:500}
+.hdr input[type=date],.hdr select{font-family:inherit;font-size:12px;font-weight:500;color:var(--txt);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 7px;height:27px;cursor:pointer;outline:none}
+.hdr input[type=date]:focus,.hdr select:focus{border-color:var(--primary)}
+.btn{font-family:inherit;font-size:12px;font-weight:600;padding:4px 12px;height:27px;border-radius:6px;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;transition:opacity .15s;white-space:nowrap}
+.btn:hover{opacity:.85}
+.btn-pri{background:var(--primary);color:#fff}
+.btn-ai{background:var(--purple);color:#fff}
+.btn-ghost{background:transparent;color:var(--txt2);border:1px solid var(--border)}
+.sp{flex:1}
 
 /* ── STATUS BAR ── */
-.info-bar{background:rgba(16,185,129,.07);border-bottom:1px solid rgba(16,185,129,.2);padding:5px 16px;font-size:11px;color:var(--text);display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
-.info-bar strong{color:var(--accent);}
-.sdot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;}
+.sbar{background:var(--card);border-bottom:1px solid var(--border);padding:5px 18px;display:flex;align-items:center;gap:14px;font-size:11.5px;color:var(--txt2)}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
+.sdate{color:var(--green);font-weight:700}
 
 /* ── KPI CARDS ── */
-.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:12px 16px 4px;}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--card-r);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--shadow);transition:transform .15s;}
-.kpi-card:hover{transform:translateY(-2px);}
-.kpi-bar{width:3px;min-height:46px;border-radius:2px;flex-shrink:0;}
-.kpi-body{flex:1;min-width:0;}
-.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
-.kpi-icon{font-size:18px;}
-.kpi-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;}
-.kpi-val{font-family:'DM Mono',monospace;font-size:clamp(14px,1.8vw,20px);font-weight:700;line-height:1.1;margin:2px 0;}
-.kpi-lbl{font-size:9px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;}
-.kpi-sub{font-size:10px;color:var(--dim);margin-top:2px;}
-.up{background:#d1fae5;color:#059669;}
-.down{background:#fee2e2;color:#dc2626;}
-.neutral{background:#f1f5f9;color:var(--dim);}
+.kpi-row{padding:14px 18px 0;display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 14px;display:flex;flex-direction:column;gap:5px;transition:transform .15s,box-shadow .15s;cursor:default}
+.kpi:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.09)}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.kpi-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.kpi-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.up{background:var(--green-lt);color:var(--green)}
+.down{background:var(--red-lt);color:var(--red)}
+.neutral{background:#f1f5f9;color:var(--txt2)}
+.kpi-lbl{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px}
+.kpi-val{font-size:21px;font-weight:800;color:var(--txt);letter-spacing:-.5px;line-height:1.1}
+.kpi-sub{font-size:10.5px;color:var(--txt3)}
+
+/* ── DATA STATUS ── */
+.dstat{margin:11px 18px 0;background:var(--green-lt);border:1px solid #6ee7b7;border-radius:8px;padding:7px 14px;font-size:11.5px;color:#065f46;display:flex;align-items:center;gap:8px}
 
 /* ── TABS ── */
-.tab-bar{display:flex;gap:0;padding:0 16px;margin-top:8px;border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.tab-bar::-webkit-scrollbar{display:none;}
-.tab{padding:9px 20px;font-size:13px;font-weight:600;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
-.tab:hover{color:var(--blue);background:rgba(37,99,235,.05);}
-.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
-.tab-content{display:none;}
-.tab-content.active{display:block;}
-.filter-note{font-size:11px;color:var(--dim);margin-left:auto;align-self:center;padding-right:2px;}
+.tab-wrap{background:var(--card);border-bottom:1px solid var(--border);padding:0 18px;display:flex;gap:0;margin-top:12px}
+.tab{font-family:inherit;font-size:12.5px;font-weight:500;color:var(--txt2);background:transparent;border:none;border-bottom:2px solid transparent;padding:9px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tab:hover{color:var(--primary)}
+.tab.on{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+.panel{display:none;padding:14px 18px 28px}.panel.on{display:block}
 
-/* ── LAYOUT ── */
-.content{padding:12px 16px 20px;}
-.chart-grid{display:grid;gap:12px;margin-bottom:12px;}
-.g-2{grid-template-columns:1fr 1fr;}
-.g-32{grid-template-columns:2fr 1fr;}
-.g-1{grid-template-columns:1fr;}
-.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--card-r);padding:14px;box-shadow:var(--shadow);}
-.chart-title{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
-.chart-sub{font-size:11px;font-weight:400;color:var(--dim);}
-.chart-wrap{position:relative;width:100%;}
+/* ── CHART CARDS ── */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row32{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:15px}
+.ct{font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:12px}
+.csub{font-size:11px;color:var(--txt3);font-weight:400;margin-left:5px}
+.cw{position:relative}
 
-/* ── SORTABLE TABLES ── */
-.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:6px;}
-.tbl-scroll{overflow-y:auto;}
-.stbl{width:100%;border-collapse:collapse;font-size:12px;}
-.stbl thead tr{background:var(--accent);color:#fff;position:sticky;top:0;z-index:1;}
-.stbl th{padding:8px 12px;text-align:left;font-size:10px;font-weight:600;white-space:nowrap;cursor:pointer;user-select:none;}
-.stbl th.num{text-align:right;}
-.stbl th .si{margin-left:4px;font-size:9px;opacity:.7;}
-.stbl tbody tr:nth-child(even){background:var(--bg);}
-.stbl tbody tr:hover{background:#e8f0fd;}
-.stbl td{padding:7px 12px;border-bottom:1px solid var(--border);color:var(--text);}
-.stbl td.num{text-align:right;font-family:'DM Mono',monospace;font-size:11px;}
-.stbl tfoot tr{background:var(--accent);color:#fff;}
-.stbl tfoot td{padding:8px 12px;font-weight:700;font-size:11px;}
-.stbl tfoot td.num{text-align:right;font-family:'DM Mono',monospace;}
-
-/* ── OPEX KPI ROW ── */
-.opex-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
-.opex-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--card-r);padding:13px 14px;box-shadow:var(--shadow);}
-.opex-kpi .olbl{font-size:9px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
-.opex-kpi .oval{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;}
+/* ── TABLES ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:var(--bg);color:var(--txt3);font-weight:600;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--txt)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#f8fafc}
+.tscroll{overflow-y:auto}
 
 /* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;}
-.b-blue{background:#dbeafe;color:#1d4ed8;}
-.b-red{background:#fee2e2;color:#dc2626;}
-.b-or{background:#ffedd5;color:#ea580c;}
-.b-grn{background:#d1fae5;color:#059669;}
+.badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:4px}
+.b-blue{background:var(--primary-lt);color:var(--primary)}
+.b-or{background:var(--accent-lt);color:var(--accent)}
+.b-red{background:var(--red-lt);color:var(--red)}
+.b-grn{background:var(--green-lt);color:var(--green)}
+.b-pur{background:var(--purple-lt);color:var(--purple)}
+.b-neu{background:#f1f5f9;color:var(--txt2)}
+
+/* ── OPEX KPI ROW ── */
+.opex-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.opex-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 14px}
+.opex-kpi .olbl{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.opex-kpi .oval{font-size:19px;font-weight:800;color:var(--txt)}
 
 /* ── MAP ── */
-#cmap{height:440px;border-radius:6px;}
-.map-legend{margin-top:10px;display:flex;gap:18px;font-size:11px;color:var(--dim);}
-.leg-item{display:flex;align-items:center;gap:5px;}
-.leg-dot{width:10px;height:10px;border-radius:50%;}
+#cmap{height:460px;border-radius:8px}
+.map-legend{margin-top:10px;display:flex;gap:18px;font-size:11.5px;color:var(--txt2)}
+.leg-item{display:flex;align-items:center;gap:5px}
+.leg-dot{width:11px;height:11px;border-radius:50%}
 
 /* ── AI SIDEBAR ── */
-.ai-ov{display:none;position:fixed;inset:0;background:rgba(15,28,46,.35);z-index:900;}
-.ai-ov.open{display:block;}
-.ai-sb{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:96vw;background:var(--card);border-left:1px solid var(--border);z-index:901;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
-.ai-sb.open{transform:translateX(0);}
-.ai-hdr{padding:13px 16px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.ai-hdr h3{font-size:14px;font-weight:700;}
-.ai-hdr p{font-size:10px;opacity:.8;}
-.ai-x{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;}
-.ai-notice{margin:10px 12px;background:#fef3c7;border:1px solid #fcd34d;border-radius:7px;padding:9px 12px;font-size:11px;color:#92400e;}
-.ai-notice strong{display:block;margin-bottom:2px;font-size:11.5px;}
-.ai-notice code{background:#fff8;padding:1px 4px;border-radius:3px;font-size:10px;}
-.chips-wrap{padding:0 12px 10px;}
-.chips-lbl{font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
-.chips{display:flex;flex-wrap:wrap;gap:5px;}
-.chip{font-family:inherit;font-size:11px;padding:4px 9px;background:var(--bg);border:1px solid var(--border);border-radius:100px;cursor:pointer;color:var(--accent);}
-.chip:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
-.ai-msgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:9px;}
-.msg{display:flex;gap:7px;align-items:flex-start;}
-.msg-bub{max-width:calc(100% - 34px);padding:8px 11px;border-radius:10px;font-size:12px;line-height:1.55;}
-.msg-ai .msg-bub{background:var(--bg);border:1px solid var(--border);}
-.msg-you{flex-direction:row-reverse;}
-.msg-you .msg-bub{background:linear-gradient(135deg,#667eea18,#764ba218);border:1px solid #667eea33;}
-.msg-av{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-weight:700;background:#ede9fe;}
-.ai-inp-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:7px;}
-.ai-inp{flex:1;font-family:inherit;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;outline:none;resize:none;}
-.ai-inp:focus{border-color:var(--purple);}
-.ai-send{width:34px;height:34px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0;}
-.ai-send:disabled{opacity:.4;cursor:not-allowed;}
-
-/* ── RESPONSIVE ── */
-@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr);}.g-32{grid-template-columns:1fr;}}
-@media(max-width:750px){
-  .g-2,.g-32{grid-template-columns:1fr;}
-  .kpi-row{grid-template-columns:repeat(2,1fr);gap:8px;padding:10px 12px 4px;}
-  .kpi-val{font-size:15px !important;}
-  .opex-kpis{grid-template-columns:repeat(2,1fr);}
-  .top-bar{padding:6px 12px;}
-  .top-bar h1{font-size:13px;}
-  .filter-row{display:none;flex-direction:column;align-items:stretch;gap:6px;padding:8px 0 4px;width:100%;}
-  .filter-row.open{display:flex;}
-  .filter-row input,.filter-row select,.cd-wrap{width:100%;}
-  .cd-btn{width:100%;justify-content:space-between;}
-  .cd-panel{min-width:100%;max-width:100%;}
-  #filter-toggle{display:block;}
-  .tab{padding:8px 14px;font-size:11px;}
-  .content{padding:8px 10px 12px;}
-  .chart-card{padding:10px;}
-  .chart-title{font-size:11px;}
-  .btn{font-size:11px;padding:5px 10px;}
-}
-@media(max-width:480px){
-  .kpi-row{grid-template-columns:1fr 1fr;gap:6px;padding:8px 10px 4px;}
-  .kpi-card{padding:9px 10px;gap:7px;}
-  .kpi-icon{font-size:15px;}
-  .opex-kpis{grid-template-columns:1fr 1fr;}
-  .stbl{font-size:11px;}
-  .stbl th,.stbl td{padding:5px 8px;}
-}
+.ai-ov{display:none;position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:200}
+.ai-ov.open{display:block}
+.ai-sb{position:fixed;top:0;right:-440px;bottom:0;width:420px;background:var(--card);border-left:1px solid var(--border);z-index:201;display:flex;flex-direction:column;transition:right .28s cubic-bezier(.4,0,.2,1)}
+.ai-sb.open{right:0}
+.ai-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ai-hdr-l{display:flex;align-items:center;gap:9px}
+.ai-ico{width:32px;height:32px;background:var(--purple-lt);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.ai-hdr h3{font-size:13px;font-weight:800;color:var(--txt)}
+.ai-hdr p{font-size:10.5px;color:var(--txt3)}
+.ai-x{background:transparent;border:none;cursor:pointer;color:var(--txt3);font-size:17px;padding:3px;display:flex;align-items:center;line-height:1}
+.ai-x:hover{color:var(--txt)}
+.ai-notice{margin:12px;background:var(--amber-lt);border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;font-size:11.5px;color:#92400e}
+.ai-notice strong{display:block;margin-bottom:3px;font-size:12px}
+.ai-notice code{background:#fff8;padding:1px 4px;border-radius:3px;font-size:10.5px}
+.chips-wrap{padding:0 12px 12px}
+.chips-lbl{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-family:inherit;font-size:11px;font-weight:500;padding:4px 9px;background:var(--bg);border:1px solid var(--border);border-radius:100px;cursor:pointer;color:var(--txt2);transition:all .13s}
+.chip:hover{background:var(--primary-lt);border-color:var(--primary);color:var(--primary)}
+.ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;gap:7px;align-items:flex-start}
+.msg-av{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-weight:700}
+.msg-ai .msg-av{background:var(--purple-lt);font-size:14px}
+.msg-you .msg-av{background:var(--primary-lt);color:var(--primary)}
+.msg-bub{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 11px;font-size:12.5px;line-height:1.55;color:var(--txt);max-width:calc(100% - 36px)}
+.msg-you{flex-direction:row-reverse}
+.msg-you .msg-bub{background:var(--primary);color:#fff;border-color:var(--primary)}
+.ai-inp-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:7px}
+.ai-inp{flex:1;font-family:inherit;font-size:12.5px;padding:7px 11px;border:1px solid var(--border);border-radius:7px;outline:none;background:var(--bg);color:var(--txt);resize:none}
+.ai-inp:focus{border-color:var(--primary)}
+.ai-send{width:34px;height:34px;background:var(--primary);border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0;transition:opacity .15s}
+.ai-send:hover{opacity:.85}
+.ai-send:disabled{opacity:.38;cursor:not-allowed}
 
 /* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+/* ══════════════════════════════════════════════════════════════
+   Checkbox Dropdown Filter Widget
+   Ported from GS Agencies beverage dashboard; variables remapped
+   to Gas Agency's CSS custom properties.
+══════════════════════════════════════════════════════════════ */
+.cd-wrap{position:relative;display:inline-block;}
+.cd-btn{
+  padding:0 9px 0 8px;font-size:12px;font-family:inherit;font-weight:600;
+  background:var(--card);border:1px solid var(--border);border-radius:6px;
+  color:var(--txt);cursor:pointer;white-space:nowrap;min-width:138px;height:27px;
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  transition:border-color .15s;
+}
+.cd-btn:hover,.cd-btn.open{border-color:var(--primary);color:var(--primary);}
+.cd-arrow{font-size:9px;flex-shrink:0;}
+.cd-panel{
+  display:none;position:absolute;top:calc(100% + 4px);left:0;
+  min-width:210px;max-width:290px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius-lg);
+  box-shadow:0 6px 20px rgba(0,0,0,0.13);z-index:500;padding:6px 0;
+}
+.cd-panel.open{display:block;}
+.cd-search{
+  width:100%;border:none;border-bottom:1px solid var(--border);
+  padding:7px 10px;font-size:12px;font-family:inherit;outline:none;
+  background:#fafafa;color:var(--txt);
+}
+.cd-list{max-height:200px;overflow-y:auto;padding:4px 0;}
+.cd-item{
+  display:flex;align-items:center;gap:8px;padding:5px 12px;
+  font-size:12px;cursor:pointer;transition:background .1s;
+}
+.cd-item:hover{background:var(--bg);}
+.cd-item input[type=checkbox]{
+  width:13px;height:13px;cursor:pointer;
+  accent-color:var(--primary);flex-shrink:0;
+}
+.cd-divider{border:none;border-top:1px solid var(--border);margin:4px 0;}
+.cd-actions{display:flex;gap:4px;padding:6px 10px 4px;}
+.cd-actions button{
+  flex:1;padding:4px 0;font-size:11px;font-weight:600;
+  border:1px solid var(--border);border-radius:3px;cursor:pointer;
+  background:var(--bg);color:var(--txt2);transition:all .1s;
+  font-family:inherit;
+}
+.cd-actions button:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+/* Mobile adjustments */
+@media(max-width:700px){
+  .cd-wrap{width:100%;}
+  .cd-btn{width:100%;justify-content:space-between;min-width:unset;}
+  .cd-panel{min-width:100%;max-width:100%;}
+}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  <h1>🔥 Vikram HP Gas Agency</h1>
-  <span class="spacer"></span>
-  <button id="filter-toggle" onclick="toggleFilters()">⚙️ Filters ▾</button>
-  <div id="filter-panel" class="filter-row">
-    <label>From</label>
-    <input type="date" id="d-from" onchange="applyFilters()">
-    <label>To</label>
-    <input type="date" id="d-to" onchange="applyFilters()">
-    <select id="granularity" onchange="applyFilters()">
-      <option value="monthly" selected>Monthly</option>
-      <option value="weekly">Weekly</option>
-      <option value="daily">Daily</option>
-    </select>
-    <select id="metric-sel" onchange="applyFilters()">
-      <option value="cylinders" selected>Cylinders Sold</option>
-      <option value="revenue">Sales Revenue</option>
-      <option value="profit">Net Profit</option>
-    </select>
-    <!-- Location checkbox dropdown -->
-    <div class="cd-wrap" id="cd-location">
-      <button class="cd-btn" onclick="toggleCD('location')" id="cd-location-btn">
-        <span id="cd-location-lbl">📍 All Locations</span>
-        <span class="cd-arrow">▾</span>
-      </button>
-      <div class="cd-panel" id="cd-location-panel">
-        <input class="cd-search" placeholder="Search locations…" oninput="searchCD('location',this.value)">
-        <div class="cd-actions">
-          <button onclick="selectAllCD('location')">All</button>
-          <button onclick="clearAllCD('location')">None</button>
-        </div>
-        <hr class="cd-divider">
-        <div class="cd-list" id="cd-location-list"></div>
-      </div>
-    </div>
-    <!-- Customer checkbox dropdown -->
-    <div class="cd-wrap" id="cd-customer">
-      <button class="cd-btn" onclick="toggleCD('customer')" id="cd-customer-btn">
-        <span id="cd-customer-lbl">👤 All Customers</span>
-        <span class="cd-arrow">▾</span>
-      </button>
-      <div class="cd-panel" id="cd-customer-panel">
-        <input class="cd-search" placeholder="Search customers…" oninput="searchCD('customer',this.value)">
-        <div class="cd-actions">
-          <button onclick="selectAllCD('customer')">All</button>
-          <button onclick="clearAllCD('customer')">None</button>
-        </div>
-        <hr class="cd-divider">
-        <div class="cd-list" id="cd-customer-list"></div>
-      </div>
-    </div>
-    <button class="btn btn-outline" onclick="resetFilters()">↺ Reset</button>
+<!-- ══ HEADER ══════════════════════════════════════════════ -->
+<header class="hdr">
+  <div class="brand">
+    <span style="font-size:20px">🔥</span>
+    <h1>Vikram HP Gas Agency</h1>
   </div>
-  <div style="display:flex;align-items:center;gap:6px;margin-left:6px;">
-    <button class="btn btn-purple" onclick="openAI()">✨ Ask AI</button>
-  </div>
-</div>
+  <div class="vdiv"></div>
 
-<!-- STATUS BAR -->
-<div class="info-bar">
+  <!-- Date range filters -->
+  <div class="hdr-filter">
+    <span class="hdr-lbl">From</span>
+    <input type="date" id="d-from" value="2024-02-01">
+  </div>
+  <div class="hdr-filter">
+    <span class="hdr-lbl">To</span>
+    <input type="date" id="d-to" value="2026-05-18">
+  </div>
+
+  <!-- Granularity & metric selects (unchanged) -->
+  <select id="granularity">
+    <option value="monthly" selected>Monthly</option>
+    <option value="weekly">Weekly</option>
+    <option value="daily">Daily</option>
+  </select>
+  <select id="metric-sel">
+    <option value="cylinders" selected>Cylinders Sold</option>
+    <option value="revenue">Sales Revenue</option>
+    <option value="profit">Net Profit</option>
+  </select>
+
+  <!-- ── Location CheckDropdown (replaces old <select id="loc-filter">) ── -->
+  <div class="cd-wrap" id="cd-location">
+    <button class="cd-btn" onclick="toggleCD('location')" id="cd-location-btn">
+      <span id="cd-location-lbl">📍 All Locations</span>
+      <span class="cd-arrow">▾</span>
+    </button>
+    <div class="cd-panel" id="cd-location-panel">
+      <input class="cd-search" placeholder="Search locations…"
+        oninput="searchCD('location',this.value)">
+      <div class="cd-actions">
+        <button onclick="selectAllCD('location')">All</button>
+        <button onclick="clearAllCD('location')">None</button>
+      </div>
+      <hr class="cd-divider">
+      <div class="cd-list" id="cd-location-list"></div>
+    </div>
+  </div>
+
+  <!-- ── Customer CheckDropdown (cascades from Location) ── -->
+  <div class="cd-wrap" id="cd-customer">
+    <button class="cd-btn" onclick="toggleCD('customer')" id="cd-customer-btn">
+      <span id="cd-customer-lbl">👤 All Customers</span>
+      <span class="cd-arrow">▾</span>
+    </button>
+    <div class="cd-panel" id="cd-customer-panel">
+      <input class="cd-search" placeholder="Search customers…"
+        oninput="searchCD('customer',this.value)">
+      <div class="cd-actions">
+        <button onclick="selectAllCD('customer')">All</button>
+        <button onclick="clearAllCD('customer')">None</button>
+      </div>
+      <hr class="cd-divider">
+      <div class="cd-list" id="cd-customer-list"></div>
+    </div>
+  </div>
+
+  <button class="btn btn-pri" onclick="applyFilters()">Apply</button>
+  <div class="sp"></div>
+  <button class="btn btn-ghost">🔄 Refresh</button>
+  <button class="btn btn-ai" onclick="openAI()">✨ Ask AI</button>
+</header>
+
+<!-- ══ STATUS BAR ══════════════════════════════════════════ -->
+<div class="sbar">
   <span class="sdot"></span>
-  Sales data up to: <strong id="s-upto">—</strong>
-  &nbsp;|&nbsp; 🕐 Exported: <span id="s-exp">—</span>
-  &nbsp;|&nbsp; <span id="s-stat">Loading data…</span>
+  Sales data up to: <span class="sdate">2026-05-18</span>
+  &nbsp;|&nbsp;
+  🕐 Exported: <span id="exp-time">2026-05-18 17:51:06</span>
 </div>
 
-<!-- KPI CARDS -->
+<!-- ══ KPI CARDS ═══════════════════════════════════════════ -->
 <div class="kpi-row">
-  <div class="kpi-card">
-    <div class="kpi-bar" style="background:#2563eb;"></div>
-    <div class="kpi-body">
-      <div class="kpi-top"><span class="kpi-icon">💰</span><span class="kpi-badge up">+12% YoY</span></div>
-      <div class="kpi-val" id="kpi-revenue">—</div>
-      <div class="kpi-lbl">Total Revenue</div>
-      <div class="kpi-sub">All products combined</div>
+  <div class="kpi">
+    <div class="kpi-top">
+      <div class="kpi-ico" style="background:#dbeafe">💰</div>
+      <span class="kpi-badge up">+12% YoY</span>
     </div>
+    <div class="kpi-lbl">Total Revenue</div>
+    <div class="kpi-val" id="kpi-revenue">—</div>
+    <div class="kpi-sub">All products combined</div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-bar" style="background:#10b981;"></div>
-    <div class="kpi-body">
-      <div class="kpi-top"><span class="kpi-icon">📈</span><span class="kpi-badge up" id="kpi-gm-badge">Gross profit</span></div>
-      <div class="kpi-val" id="kpi-profit">—</div>
-      <div class="kpi-lbl">Gross Profit</div>
-      <div class="kpi-sub" id="kpi-profit-sub">After procurement cost</div>
+  <div class="kpi">
+    <div class="kpi-top">
+      <div class="kpi-ico" style="background:#d1fae5">📈</div>
+      <span class="kpi-badge up">Gross profit</span>
     </div>
+    <div class="kpi-lbl">Gross Profit</div>
+    <div class="kpi-val" id="kpi-profit">—</div>
+    <div class="kpi-sub" id="kpi-profit-sub">After procurement cost</div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-bar" style="background:#ef4444;"></div>
-    <div class="kpi-body">
-      <div class="kpi-top"><span class="kpi-icon">💳</span><span class="kpi-badge down" id="kpi-recv-badge">of sale</span></div>
-      <div class="kpi-val" id="kpi-recv">—</div>
-      <div class="kpi-lbl">Outstanding Dues</div>
-      <div class="kpi-sub">Across active customers</div>
+  <div class="kpi">
+    <div class="kpi-top">
+      <div class="kpi-ico" style="background:#fee2e2">💳</div>
+      <span class="kpi-badge down" id="kpi-recv-sub">of sale</span>
     </div>
+    <div class="kpi-lbl">Outstanding Dues</div>
+    <div class="kpi-val" id="kpi-recv">—</div>
+    <div class="kpi-sub">Across active customers</div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-bar" style="background:#f59e0b;"></div>
-    <div class="kpi-body">
-      <div class="kpi-top"><span class="kpi-icon">🛢️</span><span class="kpi-badge neutral">in hand</span></div>
-      <div class="kpi-val" id="kpi-stock">—</div>
-      <div class="kpi-lbl">Stock in Hand</div>
-      <div class="kpi-sub">19 kg cylinders</div>
+  <div class="kpi">
+    <div class="kpi-top">
+      <div class="kpi-ico" style="background:#ffedd5">🛢️</div>
+      <span class="kpi-badge neutral">in hand</span>
     </div>
+    <div class="kpi-lbl">Stock in Hand</div>
+    <div class="kpi-val" id="kpi-stock">—</div>
+    <div class="kpi-sub">19 kg cylinders available</div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-bar" style="background:#7c3aed;"></div>
-    <div class="kpi-body">
-      <div class="kpi-top"><span class="kpi-icon">🛒</span><span class="kpi-badge neutral">all types</span></div>
-      <div class="kpi-val" id="kpi-purchases">—</div>
-      <div class="kpi-lbl">Total Purchases</div>
-      <div class="kpi-sub">Stock refill procurement</div>
+  <div class="kpi">
+    <div class="kpi-top">
+      <div class="kpi-ico" style="background:#ede9fe">🛒</div>
+      <span class="kpi-badge neutral">all types</span>
     </div>
-  </div>
-</div>
-
-<!-- TABS -->
-<div class="tab-bar" style="position:relative;">
-  <div class="tab active" onclick="switchTab('overview',this)">📊 Overview</div>
-  <div class="tab" onclick="switchTab('sales',this)">📦 Sales</div>
-  <div class="tab" onclick="switchTab('opex',this)">💸 OpEx</div>
-  <div class="tab" onclick="switchTab('recv',this)">💳 Receivables</div>
-  <div class="tab" onclick="switchTab('map',this)">🗺️ Map</div>
-  <span class="filter-note" id="filter-note"></span>
-</div>
-
-<!-- ═══ TAB: OVERVIEW ═══ -->
-<div class="tab-content active" id="tab-overview">
-  <div class="content">
-    <div class="chart-grid g-1" style="margin-bottom:12px;">
-      <div class="chart-card">
-        <div class="chart-title" id="main-ct">Full Cylinders Given — by Year and Month <span class="chart-sub" id="main-cs">Monthly trend</span></div>
-        <div class="chart-wrap" style="height:240px;"><canvas id="c-monthly"></canvas></div>
-      </div>
-    </div>
-    <div class="chart-grid g-32">
-      <div class="chart-card">
-        <div class="chart-title">Location-wise Sales <span class="chart-sub">Cumulative cylinders sold</span></div>
-        <div class="chart-wrap" style="height:340px;"><canvas id="c-loc"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Top Debtors <span class="chart-sub">Outstanding receivables</span></div>
-        <div class="tbl-wrap">
-          <div class="tbl-scroll" style="max-height:300px;">
-            <table class="stbl" id="tbl-debtors-ov">
-              <thead><tr>
-                <th onclick="sortTable('tbl-debtors-ov',0,false)">Customer <span class="si">▲</span></th>
-                <th class="num" onclick="sortTable('tbl-debtors-ov',1,true)">₹ Receivable <span class="si"></span></th>
-              </tr></thead>
-              <tbody id="tb-debtors-ov"></tbody>
-            </table>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--dim);padding-top:8px;border-top:1px solid var(--border);">
-          <span>Total Outstanding</span>
-          <strong id="recv-total-ov" style="color:#dc2626;">—</strong>
-        </div>
-      </div>
-    </div>
+    <div class="kpi-lbl">Total Purchases</div>
+    <div class="kpi-val" id="kpi-purchases">—</div>
+    <div class="kpi-sub">Stock refill procurement</div>
   </div>
 </div>
 
-<!-- ═══ TAB: SALES ═══ -->
-<div class="tab-content" id="tab-sales">
-  <div class="content">
-    <div class="chart-grid g-2" style="margin-bottom:12px;">
-      <div class="chart-card">
-        <div class="chart-title">
-          Monthly Billing vs Collections
-          <div style="display:flex;gap:10px;margin-left:auto;">
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:400;color:var(--dim);"><span style="width:9px;height:9px;border-radius:2px;background:#2563eb;display:inline-block;"></span>Billing</span>
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:400;color:var(--dim);"><span style="width:9px;height:9px;border-radius:2px;background:#f59e0b;display:inline-block;"></span>Collected</span>
-          </div>
-        </div>
-        <div class="chart-wrap" style="height:240px;"><canvas id="c-bvc"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Payment Mode Split</div>
-        <div class="chart-wrap" style="height:240px;"><canvas id="c-pay"></canvas></div>
-      </div>
+<!-- ══ DATA STATUS ══════════════════════════════════════════ -->
+<div class="dstat">
+  ✅ <span id="dstat-text">Loading data…</span>
+</div>
+
+<!-- ══ TAB NAV ══════════════════════════════════════════════ -->
+<div class="tab-wrap">
+  <button class="tab on" onclick="switchTab('overview',this)">📊 Overview</button>
+  <button class="tab" onclick="switchTab('sales',this)">📦 Sales</button>
+  <button class="tab" onclick="switchTab('opex',this)">💸 OpEx</button>
+  <button class="tab" onclick="switchTab('recv',this)">💳 Receivables</button>
+  <button class="tab" onclick="switchTab('map',this)">🗺️ Map</button>
+  <span id="filter-range-note" style="margin-left:auto;align-self:center;font-size:11px;color:var(--txt3);padding-right:4px"></span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 1 — OVERVIEW
+══════════════════════════════════════════════════════════════ -->
+<div class="panel on" id="tab-overview">
+  <!-- Main monthly chart -->
+  <div class="cc" style="margin-bottom:12px">
+    <div class="ct">Full Cylinders Given — by Year and Month <span class="csub">Monthly trend · Feb 2024 – May 2026</span></div>
+    <div class="cw" style="height:240px"><canvas id="c-monthly" role="img" aria-label="Bar chart of monthly cylinder sales from Feb 2024 to May 2026">Monthly cylinders sold from 263 in Feb 2024 to 1,100 in Apr 2026.</canvas></div>
+  </div>
+  <div class="row32">
+    <!-- Location chart -->
+    <div class="cc">
+      <div class="ct">Location-wise Sales <span class="csub">Cumulative cylinders sold</span></div>
+      <div class="cw" style="height:340px"><canvas id="c-loc" role="img" aria-label="Horizontal bar chart of cylinders sold by location. Goa leads with 6280.">Top location is Goa with 6,280 cylinders.</canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">Sales Summary</div>
-      <div class="tbl-wrap">
-        <div class="tbl-scroll" style="max-height:300px;">
-          <table class="stbl" id="tbl-sales">
-            <thead><tr>
-              <th onclick="sortTable('tbl-sales',0,false)">Month <span class="si">▲</span></th>
-              <th class="num" onclick="sortTable('tbl-sales',1,true)">Cylinders <span class="si"></span></th>
-              <th class="num" onclick="sortTable('tbl-sales',2,true)">Billing (₹) <span class="si"></span></th>
-              <th class="num" onclick="sortTable('tbl-sales',3,true)">Collected (₹) <span class="si"></span></th>
-              <th class="num" onclick="sortTable('tbl-sales',4,true)">Receivable (₹) <span class="si"></span></th>
-              <th onclick="sortTable('tbl-sales',5,false)">Status <span class="si"></span></th>
-            </tr></thead>
-            <tbody id="tb-sales"></tbody>
-          </table>
-        </div>
+    <!-- Top debtors -->
+    <div class="cc">
+      <div class="ct">Top Debtors <span class="csub">Outstanding receivables</span></div>
+      <div class="tscroll" style="max-height:300px">
+        <table class="tbl">
+          <thead><tr><th>Customer</th><th style="text-align:right">₹ Receivable</th></tr></thead>
+          <tbody id="tb-debtors-ov"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--txt2)">
+        <span>Total Outstanding</span>
+        <strong id="recv-total-ov" style="color:var(--red)">—</strong>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ TAB: OPEX ═══ -->
-<div class="tab-content" id="tab-opex">
-  <div class="content">
-    <div class="opex-kpis">
-      <div class="opex-kpi"><div class="olbl">Total Expenses</div><div class="oval" id="opex-total">—</div></div>
-      <div class="opex-kpi"><div class="olbl">Cash Expense</div><div class="oval" id="opex-cash">—</div></div>
-      <div class="opex-kpi"><div class="olbl">Online Expense</div><div class="oval" id="opex-online">—</div></div>
-      <div class="opex-kpi"><div class="olbl">Avg OpEx / Month</div><div class="oval" id="opex-avg">—</div></div>
-    </div>
-    <div class="chart-grid g-2">
-      <div class="chart-card">
-        <div class="chart-title">Expenses by Category</div>
-        <div id="opex-leg" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
-        <div class="chart-wrap" style="height:280px;"><canvas id="c-opex"></canvas></div>
+<!-- ══════════════════════════════════════════════════════════
+     TAB 2 — SALES
+══════════════════════════════════════════════════════════════ -->
+<div class="panel" id="tab-sales">
+  <div class="row2">
+    <div class="cc">
+      <div class="ct">Monthly Billing vs Collections <span class="csub">Last 12 months</span></div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--txt2)"><span style="width:10px;height:10px;border-radius:2px;background:#3b82f6;display:inline-block"></span>Billing</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--txt2)"><span style="width:10px;height:10px;border-radius:2px;background:#f97316;display:inline-block"></span>Collected</span>
       </div>
-      <div class="chart-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-          <div class="chart-title" style="margin-bottom:0;">Expense Log</div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <label style="font-size:11px;color:var(--dim);">Month</label>
-            <input type="month" id="opex-month-filter" onchange="renderOpexTable()"
-              style="font-family:inherit;font-size:12px;padding:3px 7px;border:1px solid var(--border);border-radius:4px;outline:none;background:#fafafa;">
-            <button onclick="document.getElementById('opex-month-filter').value='';renderOpexTable();"
-              style="font-family:inherit;font-size:11px;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--dim);cursor:pointer;">Clear</button>
-          </div>
-        </div>
-        <div class="tbl-wrap">
-          <div class="tbl-scroll" style="height:328px;overflow-y:auto;">
-            <table class="stbl" id="tbl-opex">
-              <thead><tr>
-                <th onclick="sortTable('tbl-opex',0,false)">Date <span class="si">▲</span></th>
-                <th onclick="sortTable('tbl-opex',1,false)">Category <span class="si"></span></th>
-                <th class="num" onclick="sortTable('tbl-opex',2,true)">Amount (₹) <span class="si"></span></th>
-                <th onclick="sortTable('tbl-opex',3,false)">Notes <span class="si"></span></th>
-              </tr></thead>
-              <tbody id="tb-opex"></tbody>
-              <tfoot id="tf-opex"></tfoot>
-            </table>
-          </div>
-        </div>
+      <div class="cw" style="height:260px"><canvas id="c-bvc" role="img" aria-label="Grouped bar chart of monthly billing vs collections for last 12 months">Billing consistently slightly above collections.</canvas></div>
+    </div>
+    <div class="cc">
+      <div class="ct">Payment Mode Split <span class="csub">Cash vs Online transactions</span></div>
+      <div style="display:flex;gap:14px;margin-bottom:10px">
+        <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--txt2)"><span style="width:10px;height:10px;border-radius:2px;background:#3b82f6;display:inline-block"></span>Cash</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--txt2)"><span style="width:10px;height:10px;border-radius:2px;background:#f97316;display:inline-block"></span>Online</span>
+      </div>
+      <div class="cw" style="height:260px"><canvas id="c-pay" role="img" aria-label="Donut chart of payment mode split between cash and online">Cash transactions dominate with approximately 72% share.</canvas></div>
+    </div>
+  </div>
+  <div class="cc">
+    <div class="ct">Monthly Sales Summary <span class="csub">Last 12 months</span></div>
+    <div class="tscroll" style="max-height:280px">
+      <table class="tbl">
+        <thead><tr><th>Month</th><th style="text-align:right">Cylinders</th><th style="text-align:right">Billing (₹)</th><th style="text-align:right">Collected (₹)</th><th style="text-align:right">Receivable (₹)</th><th style="text-align:center">Status</th></tr></thead>
+        <tbody id="tb-sales"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 3 — OPEX
+══════════════════════════════════════════════════════════════ -->
+<div class="panel" id="tab-opex">
+  <div class="opex-kpis">
+    <div class="opex-kpi"><div class="olbl">Total Expenses</div><div class="oval" id="opex-total">—</div></div>
+    <div class="opex-kpi"><div class="olbl">Cash Expense</div><div class="oval" id="opex-cash">—</div></div>
+    <div class="opex-kpi"><div class="olbl">Online Expense</div><div class="oval" id="opex-online">—</div></div>
+    <div class="opex-kpi"><div class="olbl">Avg OpEx / Month</div><div class="oval" id="opex-avg">—</div></div>
+  </div>
+  <div class="row2">
+    <div class="cc">
+      <div class="ct">Expenses by Category</div>
+      <div id="opex-leg" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px"></div>
+      <div class="cw" style="height:280px"><canvas id="c-opex" role="img" aria-label="Donut chart of operating expenses by category. Vehicle EMI is largest at 40.55%.">Vehicle EMI dominates at 40.55%, followed by Other salary at 14.21%.</canvas></div>
+    </div>
+    <div class="cc">
+      <div class="ct">Expense Log <span class="csub">Jan 2025 onwards · filtered by date range</span></div>
+      <div class="tscroll" style="max-height:360px">
+        <table class="tbl">
+          <thead><tr><th>Date</th><th>Category</th><th style="text-align:right">Amount (₹)</th><th>Notes</th></tr></thead>
+          <tbody id="tb-opex"></tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ TAB: RECEIVABLES ═══ -->
-<div class="tab-content" id="tab-recv">
-  <div class="content">
-    <div class="chart-grid g-32">
-      <div class="chart-card">
-        <div class="chart-title">Debtors — Full List <span class="chart-sub">Sorted by outstanding amount</span></div>
-        <div class="tbl-wrap">
-          <div class="tbl-scroll" style="max-height:440px;">
-            <table class="stbl" id="tbl-recv">
-              <thead><tr>
-                <th onclick="sortTable('tbl-recv',0,false)"># <span class="si"></span></th>
-                <th onclick="sortTable('tbl-recv',1,false)">Customer <span class="si"></span></th>
-                <th onclick="sortTable('tbl-recv',2,false)">Location <span class="si">▲</span></th>
-                <th class="num" onclick="sortTable('tbl-recv',3,true)">Receivable (₹) <span class="si"></span></th>
-                <th onclick="sortTable('tbl-recv',4,false)">Risk <span class="si"></span></th>
-              </tr></thead>
-              <tbody id="tb-recv"></tbody>
-            </table>
-          </div>
-        </div>
+<!-- ══════════════════════════════════════════════════════════
+     TAB 4 — RECEIVABLES
+══════════════════════════════════════════════════════════════ -->
+<div class="panel" id="tab-recv">
+  <div class="row32">
+    <div class="cc">
+      <div class="ct">Debtors — Full List <span class="csub">Sorted by outstanding amount</span></div>
+      <div class="tscroll" style="max-height:420px">
+        <table class="tbl">
+          <thead><tr><th>#</th><th>Customer</th><th>Location</th><th style="text-align:right">Receivable (₹)</th><th style="text-align:center">Risk</th></tr></thead>
+          <tbody id="tb-recv"></tbody>
+        </table>
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div class="chart-card">
-          <div class="chart-title">Receivables % of Sale</div>
-          <div class="chart-wrap" style="height:170px;"><canvas id="c-rpct"></canvas></div>
-          <div style="text-align:center;font-family:'DM Mono',monospace;font-size:26px;font-weight:700;color:#f59e0b;margin-top:-10px;" id="recv-pct-val">—</div>
-          <div style="text-align:center;font-size:11px;color:var(--dim);margin-top:2px;">of 19 kg total billing</div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Risk Breakdown</div>
-          <div style="display:flex;flex-direction:column;gap:9px;margin-top:4px;font-size:12px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;"><span><span class="badge b-red">High</span> &nbsp;&gt; ₹50,000</span><strong id="risk-high">—</strong></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;"><span><span class="badge b-or">Medium</span> &nbsp;₹10K–₹50K</span><strong id="risk-med">—</strong></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;"><span><span class="badge b-grn">Low</span> &nbsp;&lt; ₹10,000</span><strong id="risk-low">—</strong></div>
-          </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="cc">
+        <div class="ct">Receivables % of Sale</div>
+        <div class="cw" style="height:180px"><canvas id="c-rpct" role="img" aria-label="Gauge showing receivables as 1.96% of total sales">Receivables are 1.96% of total sales.</canvas></div>
+        <div style="text-align:center;font-size:26px;font-weight:800;color:var(--amber);margin-top:-16px" id="recv-pct-val">—</div>
+        <div style="text-align:center;font-size:11px;color:var(--txt3);margin-top:3px">of 19 kg total billing</div>
+      </div>
+      <div class="cc">
+        <div class="ct">Risk Breakdown</div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:6px;font-size:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-red">High</span> &nbsp;> ₹50,000</span><strong id="risk-high">—</strong></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-or">Medium</span> &nbsp;₹10K – ₹50K</span><strong id="risk-med">—</strong></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span><span class="badge b-grn">Low</span> &nbsp;< ₹10,000</span><strong id="risk-low">—</strong></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ TAB: MAP ═══ -->
-<div class="tab-content" id="tab-map">
-  <div class="content">
-    <div class="chart-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;flex-wrap:wrap;gap:6px;">
-        <div class="chart-title" style="margin-bottom:0;">Customer Distribution — Konkan Region <span class="chart-sub">Leaflet · OpenStreetMap · Free</span></div>
-        <span style="font-size:11px;color:var(--dim);" id="map-cust-count">14 locations</span>
-      </div>
-      <div id="cmap"></div>
-      <div class="map-legend">
-        <div class="leg-item"><div class="leg-dot" style="background:#2563eb;"></div>Low receivable</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#f59e0b;"></div>Medium (&gt;₹20K)</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#ef4444;"></div>High (&gt;₹1L)</div>
-        <div style="margin-left:auto;font-size:10px;color:var(--dim);">Circle size ∝ cylinders sold</div>
-      </div>
+<!-- ══════════════════════════════════════════════════════════
+     TAB 5 — MAP
+══════════════════════════════════════════════════════════════ -->
+<div class="panel" id="tab-map">
+  <div class="cc">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">
+      <div class="ct" style="margin-bottom:0">Customer Distribution — Konkan Region <span class="csub">Leaflet · OpenStreetMap · No API key needed</span></div>
+      <span style="font-size:11.5px;color:var(--txt3)">14 locations · 361 customers</span>
+    </div>
+    <div id="cmap"></div>
+    <div class="map-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#3b82f6"></div>Low receivable</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#f97316"></div>Medium (>₹20K)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#dc2626"></div>High (>₹1L)</div>
+      <div style="margin-left:auto;font-size:10.5px;color:var(--txt3)">Circle size ∝ cylinders sold</div>
     </div>
   </div>
 </div>
 
-<!-- AI OVERLAY + SIDEBAR -->
+<!-- ══ AI OVERLAY & SIDEBAR ═════════════════════════════════ -->
 <div class="ai-ov" id="ai-ov" onclick="closeAI()"></div>
 <div class="ai-sb" id="ai-sb">
   <div class="ai-hdr">
-    <div>
-      <h3>✨ Gas Agency AI</h3>
-      <p>Ask anything about your gas business data</p>
+    <div class="ai-hdr-l">
+      <div class="ai-ico">✨</div>
+      <div>
+        <h3>Gas Agency AI</h3>
+        <p>Ask anything about your gas business data</p>
+      </div>
     </div>
     <button class="ai-x" onclick="closeAI()">✕</button>
   </div>
+
   <div class="ai-notice">
     <strong>⚙️ API key not configured</strong>
-    Add your Anthropic API key to <code>config.js</code> to activate.
+    Add your Anthropic API key to <code>config.js</code> to activate live AI responses.
+    Supabase verified-answer storage coming in the next phase.
   </div>
+
   <div class="chips-wrap">
     <div class="chips-lbl">Quick Questions</div>
     <div class="chips">
@@ -536,629 +523,912 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
       <button class="chip" onclick="chipSend(this)">Highest revenue month</button>
     </div>
   </div>
+
   <div class="ai-msgs" id="ai-msgs">
     <div class="msg msg-ai">
       <div class="msg-av">✨</div>
-      <div class="msg-bub">नमस्ते! I'm your Gas Agency AI. Ask me about cylinder sales, receivables, operating costs, stock, and customer trends.<br><br><em style="color:var(--dim);font-size:11px;">Connect an API key in config.js to enable live analysis.</em></div>
+      <div class="msg-bub">
+        नमस्ते! I'm your Gas Agency AI assistant. I can answer questions about your cylinder sales, receivables, operating costs, stock refills, and customer trends.<br><br>
+        <em style="color:#94a3b8;font-size:11.5px">Connect an API key in config.js to enable live data analysis.</em>
+      </div>
     </div>
   </div>
+
   <div class="ai-inp-row">
     <textarea class="ai-inp" id="ai-inp" rows="1" placeholder="Ask about your gas business…" onkeydown="aiKey(event)"></textarea>
-    <button class="ai-send" onclick="aiSend()">➤</button>
+    <button class="ai-send" id="ai-send" onclick="aiSend()">➤</button>
   </div>
 </div>
 
+<!-- ══ DATA PLACEHOLDER (not used — real data comes from fetch) ══ -->
+<script>
+let D = null;
+const _PLACEHOLDER = {
+  meta:{ agency:"Vikram HP Gas Agency", data_upto:"2026-05-18", exported_at:"2026-05-18 17:51:06" },
+  monthly:[
+    {m:"Feb-24",cy:263,bill:465510,coll:465510},{m:"Mar-24",cy:458,bill:810660,coll:798862},
+    {m:"Apr-24",cy:574,bill:1015980,coll:893790},{m:"May-24",cy:741,bill:1311570,coll:1280000},
+    {m:"Jun-24",cy:717,bill:1269090,coll:1220000},{m:"Jul-24",cy:691,bill:1223070,coll:1190000},
+    {m:"Aug-24",cy:841,bill:1488570,coll:1420000},{m:"Sep-24",cy:958,bill:1695660,coll:1600000},
+    {m:"Oct-24",cy:973,bill:1722210,coll:1680000},{m:"Nov-24",cy:1081,bill:1913370,coll:1850000},
+    {m:"Dec-24",cy:1280,bill:2265600,coll:2180000},{m:"Jan-25",cy:1219,bill:2157330,coll:2100000},
+    {m:"Feb-25",cy:1058,bill:1872660,coll:1820000},{m:"Mar-25",cy:972,bill:1720440,coll:1680000},
+    {m:"Apr-25",cy:974,bill:1723980,coll:1700000},{m:"May-25",cy:1185,bill:2097450,coll:2050000},
+    {m:"Jun-25",cy:1010,bill:1787700,coll:1760000},{m:"Jul-25",cy:995,bill:1761150,coll:1730000},
+    {m:"Aug-25",cy:1020,bill:1805400,coll:1780000},{m:"Sep-25",cy:1090,bill:1929300,coll:1890000},
+    {m:"Oct-25",cy:1110,bill:1964700,coll:1930000},{m:"Nov-25",cy:1150,bill:2035500,coll:2010000},
+    {m:"Dec-25",cy:1230,bill:2177100,coll:2140000},{m:"Jan-26",cy:1020,bill:1805400,coll:1780000},
+    {m:"Feb-26",cy:980,bill:1734600,coll:1700000},{m:"Mar-26",cy:1050,bill:1858500,coll:1830000},
+    {m:"Apr-26",cy:1100,bill:1947000,coll:1910000},{m:"May-26",cy:410,bill:725700,coll:700000}
+  ],
+  locations:[
+    {loc:"Goa",cy:6280},{loc:"Vengurla",cy:5358},{loc:"Sawantwadi",cy:5350},
+    {loc:"Malgaon",cy:1622},{loc:"Banda",cy:1446},{loc:"Redi",cy:1281},
+    {loc:"Zarap",cy:843},{loc:"Shiroda",cy:812},{loc:"Mangaon",cy:723},
+    {loc:"Ugave",cy:659},{loc:"Tulas",cy:249},{loc:"Aros Titha",cy:221},
+    {loc:"Malewad",cy:159},{loc:"Talavade",cy:154}
+  ],
+  debtors:[
+    {c:"Rakesh",loc:"Vengurla",r:159199},{c:"Kaveri Hotel",loc:"Goa",r:122825},
+    {c:"Swad Kesari",loc:"Sawantwadi",r:61925},{c:"BKC Mess",loc:"Goa",r:52130},
+    {c:"Hill Rock",loc:"Goa",r:25470},{c:"Mauli Hotel Vengurla",loc:"Vengurla",r:25265},
+    {c:"Datta Mandir",loc:"Vengurla",r:21320},{c:"Eshor Chinese",loc:"Goa",r:16990},
+    {c:"Vikas",loc:"Sawantwadi",r:15715},{c:"Sea Princess",loc:"Goa",r:15380},
+    {c:"Hotel Shantadurga",loc:"Banda",r:12800},{c:"Naik Hotel",loc:"Redi",r:9800},
+    {c:"Kokan Spice",loc:"Malgaon",r:7200},{c:"Annapurna Hotel",loc:"Vengurla",r:6500},
+    {c:"Sai Dhaba",loc:"Sawantwadi",r:4890}
+  ],
+  opex:{
+    total:1731784, cash:428095, online:1303689, avg:144315,
+    cats:[
+      {n:"Vehicle EMI",v:702000,p:40.55},{n:"Other salary",v:246000,p:14.21},
+      {n:"Shailesh salary",v:222000,p:12.83},{n:"Fuel",v:217000,p:12.55},
+      {n:"CC Interest",v:106000,p:6.13},{n:"Office rent",v:79000,p:4.56},
+      {n:"Hamali",v:53000,p:3.08},{n:"Rakesh Commission",v:27000,p:1.53},
+      {n:"Miscellaneous",v:36784,p:2.12},{n:"Dipali Salary",v:24500,p:1.41},
+      {n:"Shraddha salary",v:19500,p:1.13}
+    ],
+    log:[
+      {d:"2025-01-01",cat:"Fuel",v:2000,note:""},{d:"2025-01-01",cat:"Miscellaneous",v:100,note:""},
+      {d:"2025-01-02",cat:"Fuel",v:600,note:""},{d:"2025-01-02",cat:"Miscellaneous",v:100,note:""},
+      {d:"2025-01-02",cat:"Shailesh salary",v:300,note:""},{d:"2025-01-03",cat:"Fuel",v:500,note:""},
+      {d:"2025-01-03",cat:"Other salary",v:6000,note:""},{d:"2025-01-03",cat:"Shailesh salary",v:5000,note:""},
+      {d:"2025-01-03",cat:"Shraddha salary",v:7000,note:""},{d:"2025-01-03",cat:"Vehicle EMI",v:11633,note:"Jeeto EMI"},
+      {d:"2025-01-04",cat:"Fuel",v:300,note:""},{d:"2025-01-04",cat:"Hamali",v:1200,note:""},
+      {d:"2025-01-05",cat:"Rakesh Commission",v:2500,note:""}
+    ]
+  },
+  map_pts:[
+    {n:"Vengurla (cluster)",loc:"Vengurla",lat:15.8625,lng:73.6363,cy:5358,r:280000},
+    {n:"Goa (cluster)",loc:"Goa",lat:15.3795,lng:73.8420,cy:6280,r:320000},
+    {n:"Sawantwadi (cluster)",loc:"Sawantwadi",lat:15.9035,lng:73.8199,cy:5350,r:85000},
+    {n:"Malgaon",loc:"Malgaon",lat:15.7620,lng:73.6540,cy:1622,r:42000},
+    {n:"Banda",loc:"Banda",lat:15.9580,lng:73.7150,cy:1446,r:18000},
+    {n:"Redi",loc:"Redi",lat:15.7420,lng:73.5620,cy:1281,r:15000},
+    {n:"Zarap",loc:"Zarap",lat:15.8100,lng:73.5900,cy:843,r:8000},
+    {n:"Shiroda",loc:"Shiroda",lat:15.7200,lng:73.7500,cy:812,r:6000},
+    {n:"Mangaon",loc:"Mangaon",lat:15.9800,lng:73.6500,cy:723,r:9200},
+    {n:"Ugave",loc:"Ugave",lat:15.8500,lng:73.7200,cy:659,r:5500},
+    {n:"Tulas",loc:"Tulas",lat:15.8800,lng:73.6800,cy:249,r:2200},
+    {n:"Aros Titha",loc:"Aros Titha",lat:15.7900,lng:73.6200,cy:221,r:1800},
+    {n:"Malewad",loc:"Malewad",lat:15.9200,lng:73.6700,cy:159,r:1200},
+    {n:"Talavade",loc:"Talavade",lat:15.8300,lng:73.5800,cy:154,r:900}
+  ]
+}; // _PLACEHOLDER end (not used — real data comes from fetch below)
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-'use strict';
 
-// ── Global data ──────────────────────────────────────────────
-let D = null;
-
-// ── Helpers ──────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
 const inr  = n => '₹' + Math.round(n).toLocaleString('en-IN');
-const inrL = n => { const l=n/100000; return '₹'+(l>=100?(l/100).toFixed(1)+'Cr':l.toFixed(1)+'L'); };
-const MON_IDX = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-function mlToDate(label){const[m,y]=label.split('-');return new Date(2000+parseInt(y),MON_IDX[m]||0,1);}
+const inrL = n => '₹' + (n/100000).toFixed(1) + 'L';
 
-// ── Chart instances ──────────────────────────────────────────
-let cMonthly,cLoc,cBvc,cPay,cOpex,cRpct;
+Chart.defaults.font = { family:"'Plus Jakarta Sans',sans-serif", size:11 };
+Chart.defaults.color = '#94a3b8';
 
-// ── Chart defaults ────────────────────────────────────────────
-function setChartDefaults(){
-  if(typeof Chart==='undefined') return;
-  Chart.defaults.font={family:"'Plus Jakarta Sans',system-ui,sans-serif",size:11};
-  Chart.defaults.color='#7a8ca0';
+// Chart instance storage (needed for update-on-filter)
+let chartMonthly, chartLoc, chartBvc, chartPay, chartOpex, chartRpct;
+
+// Month label → Date object for range comparison
+const MON = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function monthLabelToDate(label) {
+  const [m, y] = label.split('-');
+  return new Date(2000 + parseInt(y), MON[m] || 0, 1);
 }
 
-// ── Mobile filter toggle ──────────────────────────────────────
-function toggleFilters(){
-  const p=document.getElementById('filter-panel');
-  const b=document.getElementById('filter-toggle');
-  p.classList.toggle('open');
-  b.textContent=p.classList.contains('open')?'⚙️ Filters ▴':'⚙️ Filters ▾';
+// ═══════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('tab-' + id).classList.add('on');
+  btn.classList.add('on');
+  if (id === 'map' && !mapReady) initMap();
 }
 
-// ── Tab switching ─────────────────────────────────────────────
-function switchTab(id,btn){
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
-  if(id==='map'&&!mapReady) initMap();
+// ═══════════════════════════════════════════════════════════════
+// TABLE RENDERERS (unchanged from original)
+// ═══════════════════════════════════════════════════════════════
+function populateDebtorsOv(recv) {
+  const tb = document.getElementById('tb-debtors-ov');
+  tb.innerHTML = '';
+  recv.slice(0,10).forEach(d => {
+    const c = d.receivable > 50000 ? '#dc2626' : 'var(--txt)';
+    tb.innerHTML += `<tr>
+      <td>${d.customer}</td>
+      <td style="text-align:right;font-weight:700;color:${c}">${inr(d.receivable)}</td>
+    </tr>`;
+  });
+  const tot = recv.reduce((s,r) => s + r.receivable, 0);
+  document.getElementById('recv-total-ov').textContent = inr(tot);
 }
 
-// ════════════════════════════════════════════════════════
-//  SORTABLE TABLES
-// ════════════════════════════════════════════════════════
-// State: { tableId: { col, asc } }
-const _sort = {};
+function populateRecvTab(recv) {
+  const tb = document.getElementById('tb-recv');
+  tb.innerHTML = '';
+  let high=0, med=0, low=0;
+  recv.forEach((d,i) => {
+    const risk = d.receivable > 50000
+      ? '<span class="badge b-red">High</span>'
+      : d.receivable > 10000
+        ? '<span class="badge b-or">Medium</span>'
+        : '<span class="badge b-grn">Low</span>';
+    if (d.receivable > 50000) high++;
+    else if (d.receivable > 10000) med++;
+    else low++;
+    tb.innerHTML += `<tr>
+      <td style="color:var(--txt3)">${i+1}</td>
+      <td><strong>${d.customer}</strong></td>
+      <td>${d.location}</td>
+      <td style="text-align:right;font-weight:700">${inr(d.receivable)}</td>
+      <td style="text-align:center">${risk}</td>
+    </tr>`;
+  });
+  document.getElementById('risk-high').textContent = high + ' customers';
+  document.getElementById('risk-med').textContent  = med  + ' customers';
+  document.getElementById('risk-low').textContent  = low  + ' customers';
+}
 
-function sortTable(tid, col, isNum){
-  const st = _sort[tid] || {col:-1, asc:true};
-  const asc = st.col===col ? !st.asc : (isNum?false:true);
-  _sort[tid]={col,asc};
+function populateSalesTable(monthly) {
+  const tb = document.getElementById('tb-sales');
+  tb.innerHTML = '';
+  monthly.slice(-14).forEach(m => {
+    const recv = Math.max(0, m.billing - m.collected);
+    const sc = recv > 20000 ? '#dc2626' : recv > 5000 ? '#d97706' : '#059669';
+    const badge = recv > 20000 ? '<span class="badge b-red">Due</span>'
+      : recv > 0 ? '<span class="badge b-or">Partial</span>'
+      : '<span class="badge b-grn">Cleared</span>';
+    tb.innerHTML += `<tr>
+      <td><strong>${m.month}</strong></td>
+      <td style="text-align:right">${Math.round(m.cylinders).toLocaleString()}</td>
+      <td style="text-align:right">${inr(m.billing)}</td>
+      <td style="text-align:right">${inr(m.collected)}</td>
+      <td style="text-align:right;font-weight:700;color:${sc}">${inr(recv)}</td>
+      <td style="text-align:center">${badge}</td>
+    </tr>`;
+  });
+}
 
-  // Update header icons
-  const table=document.getElementById(tid);
-  if(!table) return;
-  table.querySelectorAll('th .si').forEach((si,i)=>{
-    si.textContent=i===col?(asc?'▲':'▼'):'';
+function populateOpexTable(log) {
+  const tb = document.getElementById('tb-opex');
+  tb.innerHTML = '';
+  log.forEach(e => {
+    tb.innerHTML += `<tr>
+      <td style="color:var(--txt3)">${e.date}</td>
+      <td><span class="badge b-blue">${e.category}</span></td>
+      <td style="text-align:right;font-weight:700">${inr(e.total)}</td>
+      <td style="color:var(--txt3)">${e.notes}</td>
+    </tr>`;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KPI CARDS
+// ═══════════════════════════════════════════════════════════════
+function renderKpis(kpis, monthly, recv) {
+  const totRecv  = recv.reduce((s,r) => s + r.receivable, 0);
+  const recvPct  = kpis.receivable_pct || (totRecv / kpis.revenue_19kg * 100).toFixed(2);
+  const netProfit = kpis.net_profit;
+
+  document.getElementById('kpi-revenue').textContent = inrL(kpis.total_revenue);
+  document.getElementById('kpi-profit').textContent  = inrL(kpis.gross_profit);
+  document.getElementById('kpi-recv').textContent    = inrL(totRecv);
+  document.getElementById('kpi-stock').textContent   = Math.round(kpis.stock_inhand_19kg).toLocaleString();
+  document.getElementById('kpi-purchases').textContent = inrL(kpis.total_cogs);
+  document.getElementById('kpi-recv-sub').textContent  = `${recvPct}% of 19 kg billing`;
+  document.getElementById('kpi-profit-sub').textContent = `Net: ${inrL(netProfit)} (${kpis.net_margin_pct}%)`;
+  document.getElementById('recv-pct-val').textContent   = recvPct + '%';
+
+  // Receivables gauge
+  const rp = parseFloat(recvPct);
+  if (chartRpct) {
+    chartRpct.data.datasets[0].data = [rp, Math.max(0, 100 - rp)];
+    chartRpct.update();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHART HELPERS
+// ═══════════════════════════════════════════════════════════════
+function getMetricData(monthly, metric) {
+  if (metric === 'revenue') return monthly.map(m => m.billing);
+  if (metric === 'profit')  return monthly.map(m => Math.max(0, m.billing - m.collected));
+  return monthly.map(m => m.cylinders);
+}
+function getMetricLabel(metric) {
+  if (metric === 'revenue') return 'Billing (₹)';
+  if (metric === 'profit')  return 'Est. Receivable (₹)';
+  return 'Cylinders Sold';
+}
+function getMetricTooltip(metric) {
+  if (metric === 'revenue') return c => `${inr(c.parsed.y)}`;
+  if (metric === 'profit')  return c => `${inr(c.parsed.y)}`;
+  return c => `${Math.round(c.parsed.y).toLocaleString()} cylinders`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER CHARTS
+// ─────────────────────────────────────────────────────────────
+// ARCHITECTURE NOTE:
+//   • monthly     — already date-filtered by applyFilters()
+//   • locationSales — already location-filtered by applyFilters()
+//   • opexCats / payMode — pre-aggregated, always full dataset
+//
+// Location highlighting: all bars shown are "selected"; bars
+// matching _cdSel.location get the primary blue, others a light
+// blue when filtering is active (all-mode = same colour for all).
+// ═══════════════════════════════════════════════════════════════
+function renderCharts(monthly, locationSales, opexCats, payMode) {
+  const metric = document.getElementById('metric-sel').value;
+
+  // ── Monthly bar ─────────────────────────────────────────────
+  const mLabels = monthly.map(m => m.month);
+  const mData   = getMetricData(monthly, metric);
+  const mColors = monthly.map(m =>
+    m.month.includes('26') ? '#1d4ed8' : m.month.includes('25') ? '#60a5fa' : '#bfdbfe'
+  );
+
+  if (chartMonthly) {
+    chartMonthly.data.labels = mLabels;
+    chartMonthly.data.datasets[0].data = mData;
+    chartMonthly.data.datasets[0].backgroundColor = mColors;
+    chartMonthly.data.datasets[0].label = getMetricLabel(metric);
+    chartMonthly.options.plugins.tooltip.callbacks.label = getMetricTooltip(metric);
+    chartMonthly.update();
+  } else {
+    chartMonthly = new Chart(document.getElementById('c-monthly'), {
+      type:'bar',
+      data:{ labels:mLabels, datasets:[{ label:getMetricLabel(metric), data:mData, backgroundColor:mColors, borderRadius:4, borderSkipped:false }] },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:getMetricTooltip(metric) } } },
+        scales:{ x:{ grid:{display:false}, ticks:{ autoSkip:true, maxRotation:45, maxTicksLimit:20 } }, y:{ grid:{color:'#f1f5f9'}, beginAtZero:true } }
+      }
+    });
+  }
+
+  // ── Location bar ────────────────────────────────────────────
+  // locationSales is already filtered to selected locations.
+  // All rendered bars are "active"; no need for a dim colour.
+  const locLabels = locationSales.map(l => l.location);
+  const locData   = locationSales.map(l => l.cylinders);
+  // Keep a subtle distinction: if we're in partial-selection mode
+  // every shown bar is selected → full primary colour.
+  const locColors = locData.map(() => '#3b82f6');
+
+  if (chartLoc) {
+    chartLoc.data.labels = locLabels;
+    chartLoc.data.datasets[0].data = locData;
+    chartLoc.data.datasets[0].backgroundColor = locColors;
+    chartLoc.update();
+  } else {
+    chartLoc = new Chart(document.getElementById('c-loc'), {
+      type:'bar',
+      data:{ labels:locLabels, datasets:[{ label:'Cylinders', data:locData, backgroundColor:locColors, borderRadius:3 }] },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c => `${Math.round(c.parsed.x).toLocaleString()} cylinders` } } },
+        scales:{ x:{ grid:{color:'#f1f5f9'}, beginAtZero:true }, y:{ grid:{display:false} } }
+      }
+    });
+  }
+
+  // ── Billing vs Collections (last 12 filtered months) ────────
+  const bvcSlice = monthly.slice(-12);
+  if (chartBvc) {
+    chartBvc.data.labels = bvcSlice.map(m => m.month);
+    chartBvc.data.datasets[0].data = bvcSlice.map(m => m.billing);
+    chartBvc.data.datasets[1].data = bvcSlice.map(m => m.collected);
+    chartBvc.update();
+  } else {
+    chartBvc = new Chart(document.getElementById('c-bvc'), {
+      type:'bar',
+      data:{ labels:bvcSlice.map(m => m.month), datasets:[
+        { label:'Billing',   data:bvcSlice.map(m => m.billing),   backgroundColor:'#3b82f6', borderRadius:3 },
+        { label:'Collected', data:bvcSlice.map(m => m.collected), backgroundColor:'#f97316', borderRadius:3 }
+      ]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c => `${c.dataset.label}: ${inr(c.parsed.y)}` } } },
+        scales:{ x:{ grid:{display:false}, ticks:{maxRotation:45} }, y:{ grid:{color:'#f1f5f9'}, ticks:{ callback:v => inrL(v) } } }
+      }
+    });
+  }
+
+  // ── Payment mode donut ───────────────────────────────────────
+  const pmData = [payMode.cash || 0, payMode.online || 0, payMode.both || 0];
+  if (chartPay) {
+    chartPay.data.datasets[0].data = pmData;
+    chartPay.update();
+  } else {
+    chartPay = new Chart(document.getElementById('c-pay'), {
+      type:'doughnut',
+      data:{ labels:['Cash','Online','Both'], datasets:[{ data:pmData, backgroundColor:['#3b82f6','#f97316','#10b981'], borderWidth:0, hoverOffset:8 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'65%',
+        plugins:{
+          legend:{ position:'bottom', labels:{ usePointStyle:true, pointStyle:'rect', boxWidth:10, padding:14 } },
+          tooltip:{ callbacks:{ label:c => `${c.label}: ${c.parsed.toLocaleString()} txns` } }
+        }
+      }
+    });
+  }
+
+  // ── OpEx donut ───────────────────────────────────────────────
+  const OPEX_COLORS = ['#3b82f6','#f97316','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#a78bfa','#fb923c','#34d399'];
+  const opexLeg = document.getElementById('opex-leg');
+  opexLeg.innerHTML = '';
+  opexCats.forEach((c,i) => {
+    opexLeg.innerHTML += `<span style="display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--txt2)">
+      <span style="width:9px;height:9px;border-radius:2px;background:${OPEX_COLORS[i%OPEX_COLORS.length]};display:inline-block"></span>
+      ${c.category} ${c.pct}%
+    </span>`;
   });
 
-  // Sort tbody rows
-  const tbody=table.querySelector('tbody');
-  if(!tbody) return;
-  const rows=[...tbody.querySelectorAll('tr')];
-  rows.sort((a,b)=>{
-    const av=a.children[col]?.dataset?.val ?? a.children[col]?.textContent.trim();
-    const bv=b.children[col]?.dataset?.val ?? b.children[col]?.textContent.trim();
-    if(isNum) return asc?(+av||0)-(+bv||0):(+bv||0)-(+av||0);
-    return asc?String(av).localeCompare(String(bv)):String(bv).localeCompare(String(av));
-  });
-  rows.forEach(r=>tbody.appendChild(r));
+  if (chartOpex) {
+    chartOpex.data.labels = opexCats.map(c => c.category);
+    chartOpex.data.datasets[0].data = opexCats.map(c => c.total);
+    chartOpex.update();
+  } else {
+    chartOpex = new Chart(document.getElementById('c-opex'), {
+      type:'doughnut',
+      data:{ labels:opexCats.map(c => c.category), datasets:[{ data:opexCats.map(c => c.total), backgroundColor:OPEX_COLORS, borderWidth:0, hoverOffset:8 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'55%',
+        plugins:{
+          legend:{display:false},
+          tooltip:{ callbacks:{ label:c => `${c.label}: ${inr(c.parsed)} (${opexCats[c.dataIndex].pct}%)` } }
+        }
+      }
+    });
+  }
+
+  // ── Receivables gauge (created once; updated via renderKpis) ─
+  if (!chartRpct) {
+    chartRpct = new Chart(document.getElementById('c-rpct'), {
+      type:'doughnut',
+      data:{ labels:['Outstanding','Collected'], datasets:[{ data:[2, 98], backgroundColor:['#f97316','#e2e8f0'], borderWidth:0 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false, circumference:180, rotation:-90, cutout:'75%',
+        plugins:{ legend:{display:false}, tooltip:{enabled:false} }
+      }
+    });
+  }
 }
 
-// ════════════════════════════════════════════════════════
-//  CHECKBOX DROPDOWN  (cd-*)
-// ════════════════════════════════════════════════════════
-const _cdState={location:{},customer:{}};
+// ═══════════════════════════════════════════════════════════════
+// LEAFLET MAP
+// ═══════════════════════════════════════════════════════════════
+let mapReady = false;
+function initMap() {
+  mapReady = true;
+  const map = L.map('cmap').setView([15.75, 73.70], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom:18
+  }).addTo(map);
 
-function toggleCD(id){
-  const panel=document.getElementById('cd-'+id+'-panel');
-  const btn=document.getElementById('cd-'+id+'-btn');
-  // close others
-  ['location','customer'].forEach(k=>{
-    if(k!==id){
-      document.getElementById('cd-'+k+'-panel')?.classList.remove('open');
-      document.getElementById('cd-'+k+'-btn')?.classList.remove('open');
+  (D.map_points || []).forEach(p => {
+    const cy    = p.cylinders  || 0;
+    const recv  = p.receivable || 0;
+    const radius = p.type === 'location_cluster'
+      ? Math.max(9, Math.min(36, cy / 120))
+      : 7;
+    const color = recv > 100000 ? '#dc2626' : recv > 20000 ? '#f97316' : '#3b82f6';
+
+    L.circleMarker([p.lat, p.lng], {
+      radius, fillColor:color, color:'#fff', weight:2, opacity:1, fillOpacity:.82
+    })
+    .addTo(map)
+    .bindPopup(`<div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:165px;font-size:12px">
+      <strong style="font-size:13px">${p.name}</strong><br>
+      <span style="color:#64748b">${p.location}</span>
+      <div style="margin-top:8px">
+        ${cy ? `<div>🛢️ <strong>${cy.toLocaleString()}</strong> cylinders sold</div>` : ''}
+        <div style="color:${recv>50000?'#dc2626':'#059669'}">💳 ${inr(recv)} receivable</div>
+      </div>
+    </div>`, { closeButton:false });
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+//  CHECKDROPDOWN ENGINE
+//  Ported from GS Agencies Beverage Dashboard (File A).
+//  State management is identical; cascade logic is adapted to
+//  scrape D.receivables instead of DATA.customers.
+// ═══════════════════════════════════════════════════════════════
+
+// _cdAll[id]=true  → "All" mode — no filter applied for this dimension
+// _cdSel[id]=Set   → explicit selections when not in "all" mode
+// _cdItems[id]     → full ordered item list for the dropdown
+const _cdAll  = { location: true,  customer: true  };
+const _cdSel  = { location: new Set(), customer: new Set() };
+const _cdItems = { location: [],    customer: []    };
+
+/**
+ * Rebuild the checkbox list for a given dropdown id.
+ * Reflects current _cdAll / _cdSel state.
+ */
+function _buildCDList(id) {
+  const list  = document.getElementById('cd-' + id + '-list');
+  const items = _cdItems[id];
+  list.innerHTML = items.map(v => {
+    const chk = _cdAll[id] || _cdSel[id].has(v);
+    return `<label class="cd-item">
+      <input type="checkbox" value="${v.replace(/"/g, '&quot;')}" ${chk ? 'checked' : ''}>
+      <span>${v}</span>
+    </label>`;
+  }).join('');
+  list.querySelectorAll('input').forEach(cb => {
+    cb.addEventListener('change', () => _onCDChange(id, cb.value, cb.checked));
+  });
+}
+
+/**
+ * Called when a checkbox is toggled.
+ * Handles transition from "all" mode and back.
+ */
+function _onCDChange(id, value, checked) {
+  if (_cdAll[id]) {
+    // First deviation from "all" mode — materialise every item into selSet
+    _cdAll[id] = false;
+    _cdItems[id].forEach(v => _cdSel[id].add(v));
+  }
+  if (checked) _cdSel[id].add(value);
+  else         _cdSel[id].delete(value);
+  // If every item is checked again → restore "all" mode
+  if (_cdSel[id].size === _cdItems[id].length) {
+    _cdAll[id] = true;
+    _cdSel[id].clear();
+  }
+  _updateCDLabel(id);
+  // Changing location cascades the customer list
+  if (id === 'location') _refreshCustomerList();
+  applyFilters();
+}
+
+/** Update the button label to reflect current selection state. */
+function _updateCDLabel(id) {
+  const icon = id === 'location' ? '📍' : '👤';
+  const noun = id === 'location' ? 'Location' : 'Customer';
+  let txt;
+  if (_cdAll[id])               txt = icon + ' All ' + noun + 's';
+  else if (_cdSel[id].size===0) txt = icon + ' None selected';
+  else if (_cdSel[id].size===1) txt = icon + ' ' + [..._cdSel[id]][0];
+  else                          txt = icon + ' ' + _cdSel[id].size + ' ' + noun + 's';
+  document.getElementById('cd-' + id + '-lbl').textContent = txt;
+}
+
+/** Toggle open/close for one dropdown, closing all others. */
+function toggleCD(id) {
+  const panel = document.getElementById('cd-' + id + '-panel');
+  const btn   = document.getElementById('cd-' + id + '-btn');
+  // Close sibling dropdowns first
+  ['location', 'customer'].forEach(k => {
+    if (k !== id) {
+      document.getElementById('cd-' + k + '-panel').classList.remove('open');
+      document.getElementById('cd-' + k + '-btn').classList.remove('open');
     }
   });
-  const isOpen=panel.classList.contains('open');
-  panel.classList.toggle('open',!isOpen);
-  btn.classList.toggle('open',!isOpen);
+  panel.classList.toggle('open');
+  btn.classList.toggle('open');
+  if (panel.classList.contains('open'))
+    panel.querySelector('.cd-search').focus();
 }
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.cd-wrap')){
-    document.querySelectorAll('.cd-panel').forEach(p=>p.classList.remove('open'));
-    document.querySelectorAll('.cd-btn').forEach(b=>b.classList.remove('open'));
+
+/** Filter visible items by search query (hides non-matching labels). */
+function searchCD(id, q) {
+  const lower = q.toLowerCase();
+  document.getElementById('cd-' + id + '-list')
+    .querySelectorAll('.cd-item')
+    .forEach(item => {
+      const txt = item.querySelector('span').textContent.toLowerCase();
+      item.style.display = txt.includes(lower) ? '' : 'none';
+    });
+}
+
+/** Select all items in a dropdown. */
+function selectAllCD(id) {
+  _cdAll[id] = true;
+  _cdSel[id].clear();
+  _buildCDList(id);
+  _updateCDLabel(id);
+  if (id === 'location') _refreshCustomerList();
+  applyFilters();
+}
+
+/** Deselect all items in a dropdown (shows "None selected"). */
+function clearAllCD(id) {
+  _cdAll[id] = false;
+  _cdSel[id].clear();
+  _buildCDList(id);
+  _updateCDLabel(id);
+  if (id === 'location') _refreshCustomerList();
+  applyFilters();
+}
+
+// Close all dropdowns when clicking outside any .cd-wrap
+document.addEventListener('click', e => {
+  if (!e.target.closest('.cd-wrap')) {
+    document.querySelectorAll('.cd-panel.open').forEach(p => {
+      p.classList.remove('open');
+      const btn = p.previousElementSibling;
+      if (btn) btn.classList.remove('open');
+    });
   }
 });
 
-function buildCDList(id, items, withSearch){
-  const list=document.getElementById('cd-'+id+'-list');
-  if(!list) return;
-  list.innerHTML='';
-  const q=withSearch?document.querySelector('#cd-'+id+'-panel .cd-search')?.value?.toLowerCase():'';
-  items.filter(v=>!q||v.toLowerCase().includes(q)).forEach(v=>{
-    const checked=_cdState[id][v]!==false;
-    const div=document.createElement('div');
-    div.className='cd-item';
-    div.innerHTML=`<input type="checkbox" ${checked?'checked':''} onchange="onCDChange('${id}','${CSS.escape(v)}',this.checked)"><span>${v}</span>`;
-    // store value on the checkbox for easy retrieval
-    div.querySelector('input').dataset.val=v;
-    list.appendChild(div);
-  });
+
+// ═══════════════════════════════════════════════════════════════
+//  POPULATE & CASCADE FILTERS
+//
+//  These functions are adapted for File B's schema:
+//    • No DATA.customers master array exists.
+//    • Locations and customers are scraped live from D.receivables.
+//    • D.receivables rows have the shape { customer, location, receivable }
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Build the initial Location CheckDropdown from D.receivables.
+ * Called once at the end of initDashboard().
+ */
+function populateFilters() {
+  // Extract unique locations from the receivables array
+  const locs = [
+    ...new Set((D.receivables || []).map(r => r.location || 'Unknown'))
+  ].sort();
+
+  _cdItems.location = locs;
+  _cdAll.location   = true;
+  _cdSel.location.clear();
+  _buildCDList('location');
+  _updateCDLabel('location');
+
+  // Build the customer dropdown from all receivables (no location filter yet)
+  _refreshCustomerList();
 }
 
-function onCDChange(id,escapedVal,checked){
-  // find the actual value from the checkbox dataset
-  const cb=event.target;
-  const val=cb.dataset.val;
-  _cdState[id][val]=checked;
-  updateCDLabel(id);
-  if(id==='location') rebuildCustomerCD();
-  applyFilters();
-}
-
-function selectAllCD(id){
-  Object.keys(_cdState[id]).forEach(k=>_cdState[id][k]=true);
-  document.querySelectorAll(`#cd-${id}-list input[type=checkbox]`).forEach(c=>c.checked=true);
-  updateCDLabel(id);
-  if(id==='location') rebuildCustomerCD();
-  applyFilters();
-}
-
-function clearAllCD(id){
-  Object.keys(_cdState[id]).forEach(k=>_cdState[id][k]=false);
-  document.querySelectorAll(`#cd-${id}-list input[type=checkbox]`).forEach(c=>c.checked=false);
-  updateCDLabel(id);
-  if(id==='location') rebuildCustomerCD();
-  applyFilters();
-}
-
-function searchCD(id,q){
-  const items=id==='location'
-    ? (D?.location_sales||[]).map(l=>l.location)
-    : getFilteredCustomers();
-  buildCDList(id,items,true);
-}
-
-function updateCDLabel(id){
-  const total=Object.keys(_cdState[id]).length;
-  const checked=Object.values(_cdState[id]).filter(Boolean).length;
-  const lbl=document.getElementById('cd-'+id+'-lbl');
-  const prefix=id==='location'?'📍':'👤';
-  const noun=id==='location'?'Location':'Customer';
-  if(checked===total||checked===0){
-    lbl.innerHTML=`${prefix} All ${noun}s`;
+/**
+ * Rebuild the Customer dropdown based on which locations are currently selected.
+ * Scrapes D.receivables — no static customer master needed.
+ */
+function _refreshCustomerList() {
+  let custs;
+  if (_cdAll.location) {
+    // No location filter → show all customers
+    custs = [
+      ...new Set((D.receivables || []).map(r => r.customer))
+    ].sort();
+  } else if (_cdSel.location.size === 0) {
+    // No locations selected → no customers possible
+    custs = [];
   } else {
-    lbl.innerHTML=`${prefix} ${checked} ${noun}${checked>1?'s':''} <span class="cd-count">${checked}</span>`;
+    // Show only customers whose location is in the selected set
+    custs = [
+      ...new Set(
+        (D.receivables || [])
+          .filter(r => _cdSel.location.has(r.location || 'Unknown'))
+          .map(r => r.customer)
+      )
+    ].sort();
   }
+  _cdItems.customer = custs;
+  _cdAll.customer   = true;
+  _cdSel.customer.clear();
+  _buildCDList('customer');
+  _updateCDLabel('customer');
 }
 
-function getSelectedCD(id){
-  const keys=Object.entries(_cdState[id]).filter(([,v])=>v).map(([k])=>k);
-  return keys.length===Object.keys(_cdState[id]).length ? null : keys;
+/**
+ * Collect the current filter values from the header UI.
+ * Returns a plain object used by applyFilters() and _matchesLocCust().
+ */
+function getFilters() {
+  return {
+    from:    document.getElementById('d-from').value,
+    to:      document.getElementById('d-to').value,
+    allLoc:  _cdAll.location,
+    selLoc:  _cdSel.location,
+    allCust: _cdAll.customer,
+    selCust: _cdSel.customer,
+  };
 }
 
-function getFilteredCustomers(){
-  const selLocs=getSelectedCD('location');
-  return (D?.customers||[])
-    .filter(c=>c.name&&(!selLocs||selLocs.includes(c.location)))
-    .map(c=>c.name);
-}
-
-function rebuildCustomerCD(){
-  if(!D) return;
-  const items=getFilteredCustomers();
-  // preserve checked state, default true for new items
-  items.forEach(v=>{if(_cdState.customer[v]===undefined)_cdState.customer[v]=true;});
-  buildCDList('customer',items,false);
-  updateCDLabel('customer');
-}
-
-function initCDs(){
-  // Locations
-  (D.location_sales||[]).forEach(l=>{_cdState.location[l.location]=true;});
-  buildCDList('location',(D.location_sales||[]).map(l=>l.location),false);
-  updateCDLabel('location');
-  // Customers
-  (D.customers||[]).filter(c=>c.name).forEach(c=>{_cdState.customer[c.name]=true;});
-  buildCDList('customer',getFilteredCustomers(),false);
-  updateCDLabel('customer');
-}
-
-function resetFilters(){
-  document.getElementById('d-from').value=D?.meta?.data_from||'';
-  document.getElementById('d-to').value=D?.meta?.data_upto||'';
-  document.getElementById('granularity').value='monthly';
-  document.getElementById('metric-sel').value='cylinders';
-  if(D){
-    (D.location_sales||[]).forEach(l=>{_cdState.location[l.location]=true;});
-    (D.customers||[]).filter(c=>c.name).forEach(c=>{_cdState.customer[c.name]=true;});
-    buildCDList('location',(D.location_sales||[]).map(l=>l.location),false);
-    rebuildCustomerCD();
-    updateCDLabel('location');
-    updateCDLabel('customer');
+/**
+ * Test whether a receivable row matches the active Location + Customer filters.
+ * File B version: takes explicit customerName & locationName since there is no
+ * separate customer-master lookup map.
+ *
+ * @param {string} customerName  — r.customer field from D.receivables
+ * @param {string} locationName  — r.location field from D.receivables
+ * @param {object} f             — filter object from getFilters()
+ */
+function _matchesLocCust(customerName, locationName, f) {
+  if (!f.allLoc) {
+    if (f.selLoc.size === 0)                           return false;
+    if (!f.selLoc.has(locationName || 'Unknown'))      return false;
   }
-  applyFilters();
-}
-
-// ════════════════════════════════════════════════════════
-//  TABLE POPULATION
-// ════════════════════════════════════════════════════════
-function populateDebtorsOv(recv){
-  const tb=document.getElementById('tb-debtors-ov');
-  tb.innerHTML=recv.slice(0,10).map(d=>{
-    const c=d.receivable>50000?'#dc2626':'var(--text)';
-    return `<tr><td>${d.customer}</td><td class="num" data-val="${d.receivable}" style="color:${c};font-weight:700;">${inr(d.receivable)}</td></tr>`;
-  }).join('');
-  document.getElementById('recv-total-ov').textContent=inr(recv.reduce((s,r)=>s+r.receivable,0));
-}
-
-function populateRecvTab(recv){
-  const tb=document.getElementById('tb-recv');
-  let high=0,med=0,low=0;
-  tb.innerHTML=recv.map((d,i)=>{
-    let risk,cls;
-    if(d.receivable>50000){risk='High';cls='b-red';high++;}
-    else if(d.receivable>10000){risk='Medium';cls='b-or';med++;}
-    else{risk='Low';cls='b-grn';low++;}
-    return `<tr>
-      <td style="color:var(--dim);">${i+1}</td>
-      <td><strong>${d.customer}</strong></td>
-      <td>${d.location}</td>
-      <td class="num" data-val="${d.receivable}" style="font-weight:700;">${inr(d.receivable)}</td>
-      <td><span class="badge ${cls}">${risk}</span></td>
-    </tr>`;
-  }).join('');
-  document.getElementById('risk-high').textContent=high+' customers';
-  document.getElementById('risk-med').textContent=med+' customers';
-  document.getElementById('risk-low').textContent=low+' customers';
-}
-
-function populateSalesTable(monthly){
-  const tb=document.getElementById('tb-sales');
-  tb.innerHTML=monthly.map(m=>{
-    const recv=Math.max(0,m.billing-m.collected);
-    const sc=recv>20000?'#dc2626':recv>5000?'#d97706':'#059669';
-    const badge=recv>20000?'<span class="badge b-red">Due</span>':recv>0?'<span class="badge b-or">Partial</span>':'<span class="badge b-grn">Cleared</span>';
-    return `<tr>
-      <td><strong>${m.month}</strong></td>
-      <td class="num" data-val="${m.cylinders}">${Math.round(m.cylinders).toLocaleString()}</td>
-      <td class="num" data-val="${m.billing}">${inr(m.billing)}</td>
-      <td class="num" data-val="${m.collected}">${inr(m.collected)}</td>
-      <td class="num" data-val="${recv}" style="color:${sc};font-weight:700;">${inr(recv)}</td>
-      <td>${badge}</td>
-    </tr>`;
-  }).join('');
-}
-
-function renderOpexTable(){
-  const tb=document.getElementById('tb-opex');
-  const tf=document.getElementById('tf-opex');
-  const mf=document.getElementById('opex-month-filter').value;
-  const log=D?.opex_log||[];
-  const filtered=mf?log.filter(e=>e.date&&e.date.startsWith(mf)):log;
-  if(!filtered.length){
-    tb.innerHTML=`<tr><td colspan="4" style="text-align:center;color:var(--dim);padding:20px;">No entries for selected period</td></tr>`;
-    if(tf) tf.innerHTML='';
-    return;
+  if (!f.allCust) {
+    if (f.selCust.size === 0)                          return false;
+    if (!f.selCust.has(customerName))                  return false;
   }
-  tb.innerHTML=filtered.map(e=>`<tr>
-    <td style="color:var(--dim);">${e.date}</td>
-    <td><span class="badge b-blue">${e.category}</span></td>
-    <td class="num" data-val="${e.total}">${inr(e.total)}</td>
-    <td style="color:var(--dim);font-size:11px;">${e.notes}</td>
-  </tr>`).join('');
-  // Total row
-  const tot=filtered.reduce((s,e)=>s+e.total,0);
-  if(tf) tf.innerHTML=`<tr><td><strong>Total (${filtered.length} entries)</strong></td><td></td><td class="num">${inr(tot)}</td><td></td></tr>`;
+  return true;
 }
 
-// ════════════════════════════════════════════════════════
-//  KPI CARDS
-// ════════════════════════════════════════════════════════
-function renderKpis(kpis,recv){
-  const totRecv=recv.reduce((s,r)=>s+r.receivable,0);
-  const rp=kpis.revenue_19kg?(totRecv/kpis.revenue_19kg*100).toFixed(2):'—';
-  document.getElementById('kpi-revenue').textContent=inrL(kpis.total_revenue||0);
-  document.getElementById('kpi-profit').textContent=inrL(kpis.gross_profit||0);
-  document.getElementById('kpi-recv').textContent=inrL(totRecv);
-  document.getElementById('kpi-stock').textContent=Math.round(kpis.stock_inhand_19kg||0).toLocaleString();
-  document.getElementById('kpi-purchases').textContent=inrL(kpis.total_cogs||0);
-  document.getElementById('kpi-recv-badge').textContent=rp+'% of sale';
-  document.getElementById('kpi-gm-badge').textContent=(kpis.gross_margin_pct||0)+'%';
-  document.getElementById('kpi-profit-sub').textContent='Net: '+inrL(kpis.net_profit||0)+' ('+kpis.net_margin_pct+'%)';
-  document.getElementById('recv-pct-val').textContent=rp+'%';
-  if(cRpct){const r=parseFloat(rp)||0;cRpct.data.datasets[0].data=[r,Math.max(0,100-r)];cRpct.update();}
-}
 
-// ════════════════════════════════════════════════════════
-//  CHARTS
-// ════════════════════════════════════════════════════════
-const METRIC_TITLE={cylinders:'Full Cylinders Given',revenue:'Monthly Sales Revenue',profit:'Monthly Net Profit'};
-const GRAN_LABEL={monthly:'Monthly',weekly:'Weekly',daily:'Daily'};
+// ═══════════════════════════════════════════════════════════════
+//  APPLY FILTERS — DECOUPLED ARCHITECTURE
+//
+//  Because File B uses pre-aggregated arrays (not raw transactions),
+//  each filter dimension is applied only to the arrays that carry
+//  that dimension.  Mixing them would silently produce wrong data.
+//
+//  Rules:
+//   ┌──────────────────────────────────────────────┬─────────────────────────────────────────────────────────────┐
+//   │ Filter type                                  │ Array(s) affected                                           │
+//   ├──────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+//   │ Date (from / to)                             │ D.monthly_sales  ·  D.opex_log                              │
+//   │ Location + Customer (CheckDropdowns)         │ D.receivables  (→ populateDebtorsOv, populateRecvTab, KPIs) │
+//   │ Location only                                │ D.location_sales (→ renderCharts location bar)              │
+//   │ opex_cats / payment_mode                     │ Always full dataset (pre-aggregated, not filterable)        │
+//   └──────────────────────────────────────────────┴─────────────────────────────────────────────────────────────┘
+// ═══════════════════════════════════════════════════════════════
+function applyFilters() {
+  if (!D) return;
 
-function metricData(monthly,metric){
-  if(metric==='revenue') return monthly.map(m=>m.billing);
-  if(metric==='profit')  return monthly.map(m=>Math.max(0,m.billing-m.collected));
-  return monthly.map(m=>m.cylinders);
-}
-function yFmt(metric){ return metric==='cylinders'?v=>Math.round(v).toLocaleString():v=>inrL(v); }
-function ttFmt(metric){ return metric==='cylinders'?c=>Math.round(c.parsed.y).toLocaleString()+' cyl':c=>inr(c.parsed.y); }
+  const f = getFilters();
+  const fromDate = f.from ? new Date(f.from) : null;
+  const toDate   = f.to   ? new Date(f.to)   : null;
 
-function renderCharts(monthly,locSales,opexCats,payMode){
-  const metric=document.getElementById('metric-sel').value;
-  const gran=document.getElementById('granularity').value;
-  const first=monthly[0]?.month||'',last=monthly[monthly.length-1]?.month||'';
-  // update title
-  const ct=document.getElementById('main-ct');
-  if(ct) ct.childNodes[0].textContent=(METRIC_TITLE[metric]||'')+' — ';
-  const cs=document.getElementById('main-cs');
-  if(cs) cs.textContent=`${GRAN_LABEL[gran]||''} trend · ${first} – ${last}`;
-
-  const mLabels=monthly.map(m=>m.month);
-  const mData=metricData(monthly,metric);
-  const mColors=monthly.map(m=>m.month.includes('26')?'#1d4ed8':m.month.includes('25')?'#60a5fa':'#bfdbfe');
-
-  if(cMonthly){
-    cMonthly.data.labels=mLabels;
-    cMonthly.data.datasets[0].data=mData;
-    cMonthly.data.datasets[0].backgroundColor=mColors;
-    cMonthly.options.plugins.tooltip.callbacks.label=ttFmt(metric);
-    cMonthly.options.scales.y.ticks={callback:yFmt(metric)};
-    cMonthly.update();
-  } else {
-    cMonthly=new Chart(document.getElementById('c-monthly'),{
-      type:'bar',
-      data:{labels:mLabels,datasets:[{label:METRIC_TITLE[metric],data:mData,backgroundColor:mColors,borderRadius:4,borderSkipped:false}]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:ttFmt(metric)}}},
-        scales:{x:{grid:{display:false},ticks:{autoSkip:true,maxRotation:45,maxTicksLimit:20}},y:{grid:{color:'#f1f5f9'},beginAtZero:true,ticks:{callback:yFmt(metric)}}}}
-    });
-  }
-
-  // Location bar
-  const selLocs=getSelectedCD('location');
-  const locColors=(locSales||[]).map(l=>!selLocs||selLocs.includes(l.location)?'#2563eb':'#bfdbfe');
-  if(cLoc){
-    cLoc.data.labels=(locSales||[]).map(l=>l.location);
-    cLoc.data.datasets[0].data=(locSales||[]).map(l=>l.cylinders);
-    cLoc.data.datasets[0].backgroundColor=locColors;
-    cLoc.update();
-  } else {
-    cLoc=new Chart(document.getElementById('c-loc'),{
-      type:'bar',
-      data:{labels:(locSales||[]).map(l=>l.location),datasets:[{data:(locSales||[]).map(l=>l.cylinders),backgroundColor:locColors,borderRadius:3}]},
-      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${Math.round(c.parsed.x).toLocaleString()} cylinders`}}},
-        scales:{x:{grid:{color:'#f1f5f9'},beginAtZero:true},y:{grid:{display:false}}}}
-    });
-  }
-
-  // Billing vs collections
-  const bSlice=monthly.slice(-12);
-  if(cBvc){
-    cBvc.data.labels=bSlice.map(m=>m.month);
-    cBvc.data.datasets[0].data=bSlice.map(m=>m.billing);
-    cBvc.data.datasets[1].data=bSlice.map(m=>m.collected);
-    cBvc.update();
-  } else {
-    cBvc=new Chart(document.getElementById('c-bvc'),{
-      type:'bar',
-      data:{labels:bSlice.map(m=>m.month),datasets:[
-        {label:'Billing',data:bSlice.map(m=>m.billing),backgroundColor:'#2563eb',borderRadius:3},
-        {label:'Collected',data:bSlice.map(m=>m.collected),backgroundColor:'#f59e0b',borderRadius:3}
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${inr(c.parsed.y)}`}}},
-        scales:{x:{grid:{display:false},ticks:{maxRotation:45}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>inrL(v)}}}}
-    });
-  }
-
-  // Payment mode
-  const pmData=[payMode.cash||0,payMode.online||0,payMode.both||0];
-  if(cPay){cPay.data.datasets[0].data=pmData;cPay.update();}
-  else {
-    cPay=new Chart(document.getElementById('c-pay'),{
-      type:'doughnut',
-      data:{labels:['Cash','Online','Both'],datasets:[{data:pmData,backgroundColor:['#2563eb','#f59e0b','#10b981'],borderWidth:0,hoverOffset:8}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
-        plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'rect',boxWidth:10,padding:12}},
-        tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed.toLocaleString()} txns`}}}}
-    });
-  }
-
-  // OpEx donut
-  const OC=['#2563eb','#f59e0b','#10b981','#8b5cf6','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#a78bfa','#34d399'];
-  const leg=document.getElementById('opex-leg');
-  leg.innerHTML=opexCats.map((c,i)=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--dim)"><span style="width:8px;height:8px;border-radius:2px;background:${OC[i%OC.length]};display:inline-block;flex-shrink:0"></span>${c.category} ${c.pct}%</span>`).join('');
-  if(cOpex){cOpex.data.labels=opexCats.map(c=>c.category);cOpex.data.datasets[0].data=opexCats.map(c=>c.total);cOpex.update();}
-  else {
-    cOpex=new Chart(document.getElementById('c-opex'),{
-      type:'doughnut',
-      data:{labels:opexCats.map(c=>c.category),datasets:[{data:opexCats.map(c=>c.total),backgroundColor:OC,borderWidth:0,hoverOffset:8}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${inr(c.parsed)} (${opexCats[c.dataIndex].pct}%)`}}}}
-    });
-  }
-
-  if(!cRpct){
-    cRpct=new Chart(document.getElementById('c-rpct'),{
-      type:'doughnut',
-      data:{labels:['Outstanding','Collected'],datasets:[{data:[2,98],backgroundColor:['#f59e0b','#e2e8f0'],borderWidth:0}]},
-      options:{responsive:true,maintainAspectRatio:false,circumference:180,rotation:-90,cutout:'75%',plugins:{legend:{display:false},tooltip:{enabled:false}}}
-    });
-  }
-}
-
-// ════════════════════════════════════════════════════════
-//  MAP
-// ════════════════════════════════════════════════════════
-let mapReady=false;
-function initMap(){
-  mapReady=true;
-  const map=L.map('cmap').setView([15.75,73.70],10);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18
-  }).addTo(map);
-  (D.map_points||[]).forEach(p=>{
-    const cy=p.cylinders||0,recv=p.receivable||0;
-    const radius=p.type==='location_cluster'?Math.max(9,Math.min(36,cy/120)):7;
-    const color=recv>100000?'#ef4444':recv>20000?'#f59e0b':'#2563eb';
-    L.circleMarker([p.lat,p.lng],{radius,fillColor:color,color:'#fff',weight:2,opacity:1,fillOpacity:.82})
-    .addTo(map)
-    .bindPopup(`<div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:160px;font-size:12px">
-      <strong style="font-size:13px">${p.name}</strong><br>
-      <span style="color:#7a8ca0">${p.location}</span>
-      <div style="margin-top:7px">
-        ${cy?`<div>🛢️ <strong>${cy.toLocaleString()}</strong> cyl sold</div>`:''}
-        <div style="color:${recv>50000?'#ef4444':'#10b981'}">💳 ${inr(recv)} receivable</div>
-      </div>
-    </div>`,{closeButton:false});
-  });
-}
-
-// ════════════════════════════════════════════════════════
-//  APPLY FILTERS
-// ════════════════════════════════════════════════════════
-function applyFilters(){
-  if(!D) return;
-  const fromVal=document.getElementById('d-from').value;
-  const toVal=document.getElementById('d-to').value;
-  const gran=document.getElementById('granularity').value;
-  const metric=document.getElementById('metric-sel').value;
-  const fromDate=fromVal?new Date(fromVal):null;
-  const toDate=toVal?new Date(toVal):null;
-  const selLocs=getSelectedCD('location');
-  const selCusts=getSelectedCD('customer');
-
-  // Filter monthly by date range
-  let filteredMonthly=(D.monthly_sales||[]).filter(m=>{
-    const d=mlToDate(m.month);
-    if(fromDate&&d<fromDate) return false;
-    if(toDate&&d>toDate) return false;
+  // ── 1. DATE filter → D.monthly_sales ────────────────────────
+  const filteredMonthly = (D.monthly_sales || []).filter(m => {
+    const d = monthLabelToDate(m.month);
+    if (fromDate && d < fromDate) return false;
+    if (toDate   && d > toDate)   return false;
     return true;
   });
 
-  // Daily/weekly granularity: re-bucket from raw rows (respects loc/cust filters too)
-  if(gran!=='monthly'&&D.sales_rows?.length){
-    const buckets={};
-    D.sales_rows.forEach(r=>{
-      if(selLocs&&!selLocs.includes(r.loc)) return;
-      if(selCusts&&!selCusts.includes(r.cust)) return;
-      // need date — sales_rows only has month label; skip daily/weekly for now
-      // (date field not in compact export; month granularity always works)
-    });
-    if(Object.keys(buckets).length)
-      filteredMonthly=Object.values(buckets).sort((a,b)=>a.month.localeCompare(b.month));
-  }
+  // ── 2. LOCATION + CUSTOMER filter → D.receivables ───────────
+  const filteredRecv = (D.receivables || []).filter(r =>
+    _matchesLocCust(r.customer, r.location, f)
+  );
 
-  // Location / customer filter: aggregate directly from raw sales rows
-  // (each row already carries loc + cust from Sales_Data → Cust_Master)
-  if((selLocs||selCusts)&&D.sales_rows?.length){
-    const buckets={};
-    D.sales_rows.forEach(r=>{
-      if(selLocs&&!selLocs.includes(r.loc)) return;
-      if(selCusts&&!selCusts.includes(r.cust)) return;
-      const d=mlToDate(r.m);
-      if(fromDate&&d<fromDate) return;
-      if(toDate&&d>toDate) return;
-      if(!buckets[r.m]) buckets[r.m]={month:r.m,cylinders:0,billing:0,collected:0,receivable:0};
-      buckets[r.m].cylinders+=r.cy||0;
-      buckets[r.m].billing  +=r.bill||0;
-      buckets[r.m].collected+=r.coll||0;
-      buckets[r.m].receivable+=r.recv||0;
-    });
-    filteredMonthly=Object.values(buckets).sort((a,b)=>mlToDate(a.month)-mlToDate(b.month));
-  }
+  // ── 3. LOCATION-ONLY filter → D.location_sales ──────────────
+  //    (shown in the location bar chart; keep all when "all" mode)
+  const filteredLocSales = f.allLoc
+    ? (D.location_sales || [])
+    : (D.location_sales || []).filter(l =>
+        f.selLoc.has(l.location || 'Unknown')
+      );
 
-  // Filter receivables by location + customer
-  let filteredRecv=(D.receivables||[]);
-  if(selLocs) filteredRecv=filteredRecv.filter(r=>selLocs.includes(r.location));
-  if(selCusts) filteredRecv=filteredRecv.filter(r=>selCusts.includes(r.customer));
-
-  // Recompute OpEx cards from date-filtered opex_log
-  const filteredOpex=(D.opex_log||[]).filter(e=>{
-    if(!e.date) return true;
-    const d=new Date(e.date);
-    if(fromDate&&d<fromDate) return false;
-    if(toDate&&d>toDate) return false;
+  // ── 4. DATE filter → D.opex_log ─────────────────────────────
+  //    (table only — opex_cats donut uses full pre-aggregated data)
+  const filteredOpexLog = (D.opex_log || []).filter(e => {
+    if (!e.date) return true;
+    const d = new Date(e.date);
+    if (fromDate && d < fromDate) return false;
+    if (toDate   && d > toDate)   return false;
     return true;
   });
-  const ot=filteredOpex.reduce((s,e)=>s+e.total,0);
-  const om=new Set(filteredOpex.map(e=>e.month).filter(Boolean)).size||1;
-  document.getElementById('opex-total').textContent=inr(ot);
-  document.getElementById('opex-cash').textContent=inr(filteredOpex.reduce((s,e)=>s+e.cash,0));
-  document.getElementById('opex-online').textContent=inr(filteredOpex.reduce((s,e)=>s+e.online,0));
-  document.getElementById('opex-avg').textContent=inr(ot/om);
 
-  renderCharts(filteredMonthly,D.location_sales,D.opex_cats||[],D.payment_mode||{});
+  // ── Render everything with correctly sliced arrays ───────────
+  renderCharts(filteredMonthly, filteredLocSales, D.opex_cats || [], D.payment_mode || {});
   populateSalesTable(filteredMonthly);
   populateDebtorsOv(filteredRecv);
   populateRecvTab(filteredRecv);
-  renderKpis(D.kpis,filteredRecv);
+  populateOpexTable(filteredOpexLog.slice(0, 50));
+  renderKpis(D.kpis, filteredMonthly, filteredRecv);
 
-  // filter note
-  const n=document.getElementById('filter-note');
-  if(filteredMonthly.length){
-    const f=filteredMonthly[0].month,l=filteredMonthly[filteredMonthly.length-1].month;
-    const locNote=selLocs?' · '+selLocs.join(', '):'';
-    const custNote=selCusts&&selCusts.length<=2?' · '+selCusts.join(', '):selCusts?` · ${selCusts.length} customers`:'';
-    n.textContent=`Showing ${filteredMonthly.length} ${gran==='monthly'?'months':gran==='weekly'?'weeks':'days'}: ${f} – ${l}${locNote}${custNote}`;
+  // ── Filter range note in the tab bar ────────────────────────
+  if (filteredMonthly.length > 0) {
+    const first   = filteredMonthly[0].month;
+    const last    = filteredMonthly[filteredMonthly.length - 1].month;
+    const locPart = !f.allLoc && f.selLoc.size > 0
+      ? ' · ' + (f.selLoc.size <= 2
+          ? [...f.selLoc].join(', ')
+          : [...f.selLoc].slice(0, 2).join(', ') + ' +' + (f.selLoc.size - 2) + ' more')
+      : '';
+    const custPart = !f.allCust && f.selCust.size > 0
+      ? ' · ' + f.selCust.size + ' customer' + (f.selCust.size !== 1 ? 's' : '')
+      : '';
+    document.getElementById('filter-range-note').textContent =
+      `${filteredMonthly.length} months: ${first} – ${last}${locPart}${custPart}`;
+  } else {
+    document.getElementById('filter-range-note').textContent = 'No data in range';
   }
 }
 
-// ════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
 //  INIT DASHBOARD
-// ════════════════════════════════════════════════════════
-function initDashboard(data){
-  D=data;
-  setChartDefaults();
+//  Called after gas_data.json loads successfully.
+//  populateFilters() must run before applyFilters() so the
+//  CheckDropdown state is valid when charts are first rendered.
+// ═══════════════════════════════════════════════════════════════
+function initDashboard(data) {
+  D = data;
 
-  document.getElementById('s-upto').textContent=D.meta.data_upto||'—';
-  document.getElementById('s-exp').textContent=D.meta.exported_at||'—';
-  document.getElementById('s-stat').innerHTML=
-    `<strong>${Math.round(D.kpis.total_cylinders_sold).toLocaleString()}</strong> cylinders sold &nbsp;|&nbsp; `+
-    `<strong>${D.meta.customers}</strong> customers &nbsp;|&nbsp; `+
-    `<strong>${(D.monthly_sales||[]).length}</strong> months of data &nbsp;|&nbsp; exported: ${D.meta.exported_at}`;
+  // Status bar
+  document.querySelector('.sdate').textContent = D.meta.data_upto  || '—';
+  document.getElementById('exp-time').textContent = D.meta.exported_at || '—';
 
-  if(D.meta.data_from) document.getElementById('d-from').value=D.meta.data_from;
-  if(D.meta.data_upto) document.getElementById('d-to').value=D.meta.data_upto;
+  // Set date filter defaults to full data range
+  if (D.meta.data_from) document.getElementById('d-from').value = D.meta.data_from;
+  if (D.meta.data_upto) document.getElementById('d-to').value   = D.meta.data_upto;
 
-  initCDs();
+  // ── Populate CheckDropdowns from live D.receivables data ─────
+  // (This replaces the old loc-filter <select> population block)
+  populateFilters();
 
-  renderOpexTable();
-
+  // ── Full initial render via applyFilters (all filters = "All") ─
+  // applyFilters() calls renderCharts, populateSalesTable,
+  // populateDebtorsOv, populateRecvTab, populateOpexTable, renderKpis.
   applyFilters();
+
+  // ── OpEx KPI cards — static pre-aggregated values ────────────
+  // These are not affected by date/location filters (no raw data).
+  const opexTotal  = D.kpis.opex_total || 0;
+  const opexMonths = (D.opex_monthly || []).length || 1;
+  document.getElementById('opex-total').textContent  = inr(opexTotal);
+  document.getElementById('opex-cash').textContent   = inr((D.opex_cats||[]).reduce((s,c)=>s+c.cash,0));
+  document.getElementById('opex-online').textContent = inr((D.opex_cats||[]).reduce((s,c)=>s+c.online,0));
+  document.getElementById('opex-avg').textContent    = inr(opexTotal / opexMonths);
+
+  // ── Data status bar ──────────────────────────────────────────
+  document.getElementById('dstat-text').textContent =
+    `${Math.round(D.kpis.total_cylinders_sold).toLocaleString()} cylinders sold  |  ` +
+    `${D.meta.customers} customers  |  ` +
+    `${(D.monthly_sales||[]).length} months of data  |  exported: ${D.meta.exported_at}`;
 }
 
-// ════════════════════════════════════════════════════════
-//  FETCH
-// ════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// FETCH gas_data.json
+// ═══════════════════════════════════════════════════════════════
 fetch('./data/gas_data.json')
-  .then(r=>{if(!r.ok) throw new Error('HTTP '+r.status);return r.json();})
-  .then(data=>initDashboard(data))
-  .catch(err=>{
-    document.getElementById('s-stat').textContent='⚠️ Could not load gas_data.json — '+err.message;
-    console.error(err);
+  .then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  })
+  .then(data => initDashboard(data))
+  .catch(err => {
+    document.getElementById('dstat-text').textContent =
+      '⚠️ Could not load gas_data.json — ' + err.message;
+    console.error('Data load error:', err);
   });
 
-// ════════════════════════════════════════════════════════
-//  AI SIDEBAR
-// ════════════════════════════════════════════════════════
-function buildContext(){
-  if(!D) return '';
-  const k=D.kpis;
-  const last3=(D.monthly_sales||[]).slice(-3).map(m=>`${m.month}: ${Math.round(m.cylinders)} cyl, ${inr(m.billing)}`).join(' | ');
-  const top=(D.location_sales||[])[0]||{};
-  const debt=(D.receivables||[])[0]||{};
-  return `You are a BI assistant for Vikram HP Gas Agency, a commercial LPG distributor in Konkan, Maharashtra/Goa.
-LIVE DATA (${D.meta.exported_at}): Revenue ${inr(k.total_revenue)} | GP ${inr(k.gross_profit)} (${k.gross_margin_pct}%) | Net ${inr(k.net_profit)} (${k.net_margin_pct}%)
-Cylinders sold: ${Math.round(k.total_cylinders_sold).toLocaleString()} | Avg margin ₹${k.avg_margin_per_19kg}/cyl | Receivables ${inr(k.total_receivable)} (${k.receivable_pct}%)
-Stock in hand: ${Math.round(k.stock_inhand_19kg)} cyl | OpEx: ${inr(k.opex_total)} | Top loc: ${top.location} (${(top.cylinders||0).toLocaleString()} cyl)
-Top debtor: ${debt.customer}, ${debt.location} — ${inr(debt.receivable||0)} | Period: ${D.meta.data_from} – ${D.meta.data_upto} | Last 3 months: ${last3}
-Products: 19kg (main), 5kg, 35kg LPG. Customers: hotels/restaurants in Vengurla, Sawantwadi, Goa border, Sindhudurg.
-Answer in ₹ Indian format (Lakhs/Crores). Cite months and numbers.`;
+
+// ═══════════════════════════════════════════════════════════════
+// AI SIDEBAR
+// ═══════════════════════════════════════════════════════════════
+function buildContext() {
+  if (!D) return '';
+  const k = D.kpis;
+  const last3 = (D.monthly_sales||[]).slice(-3)
+    .map(m => `${m.month}: ${Math.round(m.cylinders)} cy, ${inr(m.billing)}`).join(' | ');
+  const topLoc  = (D.location_sales||[])[0] || {};
+  const topDebt = (D.receivables||[])[0] || {};
+
+  return `You are a business intelligence assistant for Vikram HP Gas Agency, a commercial LPG cylinder distributor in the Konkan region of Maharashtra and Goa, India.
+
+LIVE DATA SNAPSHOT (from gas_data.json exported ${D.meta.exported_at}):
+- Total revenue: ${inr(k.total_revenue)} (19kg: ${inr(k.revenue_19kg)}, 5kg: ${inr(k.revenue_5kg)}, 35kg: ${inr(k.revenue_35kg)})
+- Gross profit: ${inr(k.gross_profit)} (${k.gross_margin_pct}%) | Net profit: ${inr(k.net_profit)} (${k.net_margin_pct}%)
+- Total cylinders sold (19kg): ${Math.round(k.total_cylinders_sold).toLocaleString()}
+- Avg realised margin per 19kg cylinder: ₹${k.avg_margin_per_19kg}
+- Outstanding receivables: ${inr(k.total_receivable)} (${k.receivable_pct}% of 19kg billing)
+- Stock in hand (19kg): ${Math.round(k.stock_inhand_19kg)} cylinders
+- Total OpEx: ${inr(k.opex_total)}
+- Top location: ${topLoc.location} (${(topLoc.cylinders||0).toLocaleString()} cylinders)
+- Highest debtor: ${topDebt.customer}, ${topDebt.location} — ${inr(topDebt.receivable||0)}
+- Last 3 months: ${last3}
+- Data period: ${D.meta.data_from} to ${D.meta.data_upto}
+
+BUSINESS CONTEXT:
+Products: 19kg commercial LPG (main), 5kg, 35kg cylinders. Procured from HP Gas (GOA LPG Plant). Customers are hotels, restaurants, commercial establishments in Vengurla, Sawantwadi, Goa border area, and surrounding Sindhudurg villages. MRP varies by cylinder type and period.
+
+Answer concisely. Use ₹ and Indian number formatting (Lakhs/Crores). Cite specific months and numbers.`;
 }
-function openAI(){document.getElementById('ai-sb').classList.add('open');document.getElementById('ai-ov').classList.add('open');}
-function closeAI(){document.getElementById('ai-sb').classList.remove('open');document.getElementById('ai-ov').classList.remove('open');}
-function chipSend(btn){document.getElementById('ai-inp').value=btn.textContent;aiSend();}
-function aiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiSend();}}
-function addMsg(text,role){
-  const b=document.getElementById('ai-msgs');
-  b.innerHTML+=`<div class="msg msg-${role}"><div class="msg-av">${role==='you'?'👤':'✨'}</div><div class="msg-bub">${text}</div></div>`;
-  b.scrollTop=b.scrollHeight;
+
+const gasHelpers = {
+  topDebtors:   (n=5)  => (D.receivables||[]).slice(0,n).map(d => `${d.customer} (${d.location}): ${inr(d.receivable)}`),
+  bestLocation: ()     => (D.location_sales||[])[0],
+  recentTrend:  (n=6)  => (D.monthly_sales||[]).slice(-n),
+  stockStatus:  ()     => ({ in_hand: D.kpis.stock_inhand_19kg, note:'19kg only' }),
+  avgMargin:    ()     => `₹${D.kpis.avg_margin_per_19kg} per 19kg cylinder (realised)`,
+};
+
+function openAI() {
+  document.getElementById('ai-sb').classList.add('open');
+  document.getElementById('ai-ov').classList.add('open');
 }
-async function aiSend(){
-  const inp=document.getElementById('ai-inp');
-  const q=inp.value.trim();if(!q) return;
-  inp.value='';addMsg(q,'you');
-  /* ── LIVE (uncomment when config.js ready) ──────────────────
-  const cfg=window.GAS_CFG||{};
-  if(!cfg.API_KEY){addMsg('⚙️ Add API key to config.js','ai');return;}
-  addMsg('<em style="color:var(--dim)">Thinking…</em>','ai');
-  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':cfg.API_KEY,'anthropic-version':'2023-06-01'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:buildContext(),messages:[{role:'user',content:q}]})});
-  const data=await res.json();
-  document.getElementById('ai-msgs').lastElementChild.remove();
-  addMsg(data.content[0].text,'ai');
-  ─────────────────────────────────────────────────────────── */
-  addMsg(`<em style="color:var(--dim)">API key not configured.</em><br><br>Your question <strong>"${q}"</strong> will be answered once you add your key to <code>config.js</code>.`,'ai');
+function closeAI() {
+  document.getElementById('ai-sb').classList.remove('open');
+  document.getElementById('ai-ov').classList.remove('open');
 }
+function chipSend(btn) {
+  document.getElementById('ai-inp').value = btn.textContent;
+  aiSend();
+}
+function aiKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
+}
+
+function addMsg(text, role) {
+  const box = document.getElementById('ai-msgs');
+  const av  = role === 'you' ? 'You' : '✨';
+  box.innerHTML += `<div class="msg msg-${role}">
+    <div class="msg-av">${av}</div>
+    <div class="msg-bub">${text}</div>
+  </div>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+async function aiSend() {
+  const inp = document.getElementById('ai-inp');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  addMsg(q, 'you');
+
+  /* ── LIVE API CALL (uncomment once config.js is in place) ──────────────
+  const cfg = window.GAS_CFG || {};
+  if (!cfg.API_KEY) { addMsg('⚙️ Add your API key to config.js to enable AI.', 'ai'); return; }
+
+  addMsg('<em style="color:#94a3b8">Thinking…</em>', 'ai');
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'x-api-key': cfg.API_KEY, 'anthropic-version':'2023-06-01' },
+    body: JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system: buildContext(),
+      messages:[{ role:'user', content:q }]
+    })
+  });
+  const data = await res.json();
+  const msgs = document.getElementById('ai-msgs');
+  msgs.lastElementChild.remove(); // remove "Thinking…"
+  addMsg(data.content[0].text, 'ai');
+
+  // Supabase logging (Phase 4 — save verified answers)
+  // await supabase.from('gas_qa_log').insert({ question:q, answer:data.content[0].text, ts:new Date() });
+  ─────────────────────────────────────────────────────────────────────── */
+
+  addMsg(
+    `<em style="color:#94a3b8">API key not configured yet.</em><br><br>
+    Your question <strong>"${q}"</strong> will be answered by Claude once you add your key to <code>config.js</code>.<br><br>
+    <span style="font-size:11.5px;color:#94a3b8">The AI will use live data from gas_data.json including your ${(D&&D.monthly_sales||[]).length} months of sales, ${(D&&D.receivables||[]).length} debtor records, and full OpEx log.</span>`,
+    'ai'
+  );
+}
+
 </script>
 </body>
 </html>
