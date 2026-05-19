@@ -497,85 +497,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <!-- Data loaded from data/gas_data.json -->
 <script>
 let D = null;
-const _PLACEHOLDER = {
-  meta:{ agency:"Vikram HP Gas Agency", data_upto:"2026-05-18", exported_at:"2026-05-18 17:51:06" },
-
-  monthly:[
-    {m:"Feb-24",cy:263,bill:465510,coll:465510},{m:"Mar-24",cy:458,bill:810660,coll:798862},
-    {m:"Apr-24",cy:574,bill:1015980,coll:893790},{m:"May-24",cy:741,bill:1311570,coll:1280000},
-    {m:"Jun-24",cy:717,bill:1269090,coll:1220000},{m:"Jul-24",cy:691,bill:1223070,coll:1190000},
-    {m:"Aug-24",cy:841,bill:1488570,coll:1420000},{m:"Sep-24",cy:958,bill:1695660,coll:1600000},
-    {m:"Oct-24",cy:973,bill:1722210,coll:1680000},{m:"Nov-24",cy:1081,bill:1913370,coll:1850000},
-    {m:"Dec-24",cy:1280,bill:2265600,coll:2180000},{m:"Jan-25",cy:1219,bill:2157330,coll:2100000},
-    {m:"Feb-25",cy:1058,bill:1872660,coll:1820000},{m:"Mar-25",cy:972,bill:1720440,coll:1680000},
-    {m:"Apr-25",cy:974,bill:1723980,coll:1700000},{m:"May-25",cy:1185,bill:2097450,coll:2050000},
-    {m:"Jun-25",cy:1010,bill:1787700,coll:1760000},{m:"Jul-25",cy:995,bill:1761150,coll:1730000},
-    {m:"Aug-25",cy:1020,bill:1805400,coll:1780000},{m:"Sep-25",cy:1090,bill:1929300,coll:1890000},
-    {m:"Oct-25",cy:1110,bill:1964700,coll:1930000},{m:"Nov-25",cy:1150,bill:2035500,coll:2010000},
-    {m:"Dec-25",cy:1230,bill:2177100,coll:2140000},{m:"Jan-26",cy:1020,bill:1805400,coll:1780000},
-    {m:"Feb-26",cy:980,bill:1734600,coll:1700000},{m:"Mar-26",cy:1050,bill:1858500,coll:1830000},
-    {m:"Apr-26",cy:1100,bill:1947000,coll:1910000},{m:"May-26",cy:410,bill:725700,coll:700000}
-  ],
-
-  locations:[
-    {loc:"Goa",cy:6280},{loc:"Vengurla",cy:5358},{loc:"Sawantwadi",cy:5350},
-    {loc:"Malgaon",cy:1622},{loc:"Banda",cy:1446},{loc:"Redi",cy:1281},
-    {loc:"Zarap",cy:843},{loc:"Shiroda",cy:812},{loc:"Mangaon",cy:723},
-    {loc:"Ugave",cy:659},{loc:"Tulas",cy:249},{loc:"Aros Titha",cy:221},
-    {loc:"Malewad",cy:159},{loc:"Talavade",cy:154}
-  ],
-
-  debtors:[
-    {c:"Rakesh",loc:"Vengurla",r:159199},{c:"Kaveri Hotel",loc:"Goa",r:122825},
-    {c:"Swad Kesari",loc:"Sawantwadi",r:61925},{c:"BKC Mess",loc:"Goa",r:52130},
-    {c:"Hill Rock",loc:"Goa",r:25470},{c:"Mauli Hotel Vengurla",loc:"Vengurla",r:25265},
-    {c:"Datta Mandir",loc:"Vengurla",r:21320},{c:"Eshor Chinese",loc:"Goa",r:16990},
-    {c:"Vikas",loc:"Sawantwadi",r:15715},{c:"Sea Princess",loc:"Goa",r:15380},
-    {c:"Hotel Shantadurga",loc:"Banda",r:12800},{c:"Naik Hotel",loc:"Redi",r:9800},
-    {c:"Kokan Spice",loc:"Malgaon",r:7200},{c:"Annapurna Hotel",loc:"Vengurla",r:6500},
-    {c:"Sai Dhaba",loc:"Sawantwadi",r:4890}
-  ],
-
-  opex:{
-    total:1731784, cash:428095, online:1303689, avg:144315,
-    cats:[
-      {n:"Vehicle EMI",v:702000,p:40.55},{n:"Other salary",v:246000,p:14.21},
-      {n:"Shailesh salary",v:222000,p:12.83},{n:"Fuel",v:217000,p:12.55},
-      {n:"CC Interest",v:106000,p:6.13},{n:"Office rent",v:79000,p:4.56},
-      {n:"Hamali",v:53000,p:3.08},{n:"Rakesh Commission",v:27000,p:1.53},
-      {n:"Miscellaneous",v:36784,p:2.12},{n:"Dipali Salary",v:24500,p:1.41},
-      {n:"Shraddha salary",v:19500,p:1.13}
-    ],
-    log:[
-      {d:"2025-01-01",cat:"Fuel",v:2000,note:""},{d:"2025-01-01",cat:"Miscellaneous",v:100,note:""},
-      {d:"2025-01-02",cat:"Fuel",v:600,note:""},{d:"2025-01-02",cat:"Miscellaneous",v:100,note:""},
-      {d:"2025-01-02",cat:"Shailesh salary",v:300,note:""},{d:"2025-01-03",cat:"Fuel",v:500,note:""},
-      {d:"2025-01-03",cat:"Other salary",v:6000,note:""},{d:"2025-01-03",cat:"Shailesh salary",v:5000,note:""},
-      {d:"2025-01-03",cat:"Shraddha salary",v:7000,note:""},{d:"2025-01-03",cat:"Vehicle EMI",v:11633,note:"Jeeto EMI"},
-      {d:"2025-01-04",cat:"Fuel",v:300,note:""},{d:"2025-01-04",cat:"Hamali",v:1200,note:""},
-      {d:"2025-01-05",cat:"Rakesh Commission",v:2500,note:""}
-    ]
-  },
-
-  // Customer clusters for map — individual lat/lng from Cust_Master where available
-  // Clusters represent location groups; expand to individual pins once full Cust_Master is exported
-  map_pts:[
-    {n:"Vengurla (cluster)",loc:"Vengurla",lat:15.8625,lng:73.6363,cy:5358,r:280000},
-    {n:"Goa (cluster)",loc:"Goa",lat:15.3795,lng:73.8420,cy:6280,r:320000},
-    {n:"Sawantwadi (cluster)",loc:"Sawantwadi",lat:15.9035,lng:73.8199,cy:5350,r:85000},
-    {n:"Malgaon",loc:"Malgaon",lat:15.7620,lng:73.6540,cy:1622,r:42000},
-    {n:"Banda",loc:"Banda",lat:15.9580,lng:73.7150,cy:1446,r:18000},
-    {n:"Redi",loc:"Redi",lat:15.7420,lng:73.5620,cy:1281,r:15000},
-    {n:"Zarap",loc:"Zarap",lat:15.8100,lng:73.5900,cy:843,r:8000},
-    {n:"Shiroda",loc:"Shiroda",lat:15.7200,lng:73.7500,cy:812,r:6000},
-    {n:"Mangaon",loc:"Mangaon",lat:15.9800,lng:73.6500,cy:723,r:9200},
-    {n:"Ugave",loc:"Ugave",lat:15.8500,lng:73.7200,cy:659,r:5500},
-    {n:"Tulas",loc:"Tulas",lat:15.8800,lng:73.6800,cy:249,r:2200},
-    {n:"Aros Titha",loc:"Aros Titha",lat:15.7900,lng:73.6200,cy:221,r:1800},
-    {n:"Malewad",loc:"Malewad",lat:15.9200,lng:73.6700,cy:159,r:1200},
-    {n:"Talavade",loc:"Talavade",lat:15.8300,lng:73.5800,cy:154,r:900}
-  ]
-}; // _PLACEHOLDER end (not used — real data comes from fetch below)
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -1066,26 +987,10 @@ function applyFilters() {
       buckets[key].receivable += r.receivable ||0;
     });
     filteredMonthly = Object.values(buckets).sort((a,b)=>a.month.localeCompare(b.month));
-  } else if (gran === 'monthly' && (selLocs || selCusts) && D.sales_raw) {
-    // Re-aggregate from raw for loc/cust filter
-    const buckets = {};
-    D.sales_raw.forEach(r => {
-      if (!r.date) return;
-      const d = new Date(r.date);
-      if (fromDate && d < fromDate) return;
-      if (toDate   && d > toDate)   return;
-      if (selLocs  && !selLocs.includes(r.location)) return;
-      if (selCusts && !selCusts.includes(r.customer)) return;
-      const key = r.month;
-      if (!key) return;
-      if (!buckets[key]) buckets[key]={month:key,cylinders:0,billing:0,collected:0,receivable:0,cash_txns:0,online_txns:0,both_txns:0};
-      buckets[key].cylinders  += r.cylinders  ||0;
-      buckets[key].billing    += r.billing    ||0;
-      buckets[key].collected  += r.collected  ||0;
-      buckets[key].receivable += r.receivable ||0;
-    });
-    filteredMonthly = Object.values(buckets).sort((a,b)=>monthLabelToDate(a.month)-monthLabelToDate(b.month));
   }
+  // NOTE: monthly_sales chart is not filterable by location/customer —
+  // the JSON does not carry per-row location. Receivables tables and the
+  // location bar chart highlight respond to location/customer selection.
 
   // ── Filter receivables ─────────────────────────────────────
   let filteredRecv = (D.receivables||[]);
@@ -1248,8 +1153,6 @@ async function aiSend(){
   ─────────────────────────────────────────────────────────────── */
   addMsg(`<em style="color:#94a3b8">API key not configured yet.</em><br><br>Your question <strong>"${q}"</strong> will be answered by Claude once you add your key to <code>config.js</code>.<br><br><span style="font-size:11.5px;color:#94a3b8">AI will use live data: ${(D&&D.monthly_sales||[]).length} months, ${(D&&D.receivables||[]).length} debtors, full OpEx log.</span>`,'ai');
 }
-
-</script>
 
 Chart.defaults.font = { family:"'Plus Jakarta Sans',sans-serif", size:11 };
 Chart.defaults.color = '#94a3b8';
