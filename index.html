@@ -440,6 +440,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
                 <th onclick="sortTable('tbl-opex',3,false)">Notes <span class="si"></span></th>
               </tr></thead>
               <tbody id="tb-opex"></tbody>
+              <tfoot id="tf-opex"></tfoot>
             </table>
           </div>
         </div>
@@ -806,11 +807,13 @@ function populateSalesTable(monthly){
 
 function renderOpexTable(){
   const tb=document.getElementById('tb-opex');
+  const tf=document.getElementById('tf-opex');
   const mf=document.getElementById('opex-month-filter').value;
   const log=D?.opex_log||[];
   const filtered=mf?log.filter(e=>e.date&&e.date.startsWith(mf)):log;
   if(!filtered.length){
     tb.innerHTML=`<tr><td colspan="4" style="text-align:center;color:var(--dim);padding:20px;">No entries for selected period</td></tr>`;
+    if(tf) tf.innerHTML='';
     return;
   }
   tb.innerHTML=filtered.map(e=>`<tr>
@@ -819,6 +822,9 @@ function renderOpexTable(){
     <td class="num" data-val="${e.total}">${inr(e.total)}</td>
     <td style="color:var(--dim);font-size:11px;">${e.notes}</td>
   </tr>`).join('');
+  // Total row
+  const tot=filtered.reduce((s,e)=>s+e.total,0);
+  if(tf) tf.innerHTML=`<tr><td><strong>Total (${filtered.length} entries)</strong></td><td></td><td class="num">${inr(tot)}</td><td></td></tr>`;
 }
 
 // ════════════════════════════════════════════════════════
