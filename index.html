@@ -15,12 +15,75 @@ if(typeof Chart==='undefined'){var s=document.createElement('script');s.src='htt
   --bg:#f4f7fc;--card:#fff;--border:#e4eaf3;
   --text:#0f1c2e;--dim:#7a8ca0;--accent:#1a56db;
   --blue:#2563eb;--green:#10b981;--orange:#f59e0b;
-  --red:#ef4444;--purple:#7c3aed;--teal:#06b6d4;
+  --red:#ef4444;--purple:#8b5cf6;--teal:#06b6d4;--navy:#1e40af;
   --card-r:10px;--shadow:0 1px 3px rgba(15,28,46,.06),0 4px 16px rgba(15,28,46,.04);
-  --blue-pale:#eff6ff;
+  --blue-pale:#eff6ff;--blue-mid:#bfdbfe;
+  --gridline:#f1f5f9;--input-bg:#fafafa;
 }
+body{transition:background .2s,color .2s;}
+.dark-mode{
+  --bg:#0c111d;--card:#131929;--border:#1e2d45;
+  --text:#e8edf5;--dim:#6b7f9a;--accent:#60a5fa;
+  --blue:#3b82f6;--green:#34d399;--orange:#fbbf24;
+  --red:#f87171;--teal:#22d3ee;--purple:#a78bfa;--navy:#60a5fa;
+  --shadow:0 2px 16px rgba(0,0,0,.4);
+  --blue-pale:#1e2d45;--blue-mid:#1d3461;
+  --gridline:#1e2d45;--input-bg:#0c111d;
+}
+/* Dark-mode overrides for elements that need explicit styling */
+.dark-mode .filter-row input,.dark-mode .filter-row select,.dark-mode .cd-btn{background:var(--card);color:var(--text);border-color:var(--border);}
+.dark-mode .cd-panel{background:var(--card);border-color:var(--border);}
+.dark-mode .cd-search{background:var(--bg);color:var(--text);border-color:var(--border);}
+.dark-mode .cd-item:hover{background:rgba(255,255,255,.04);}
+.dark-mode .stbl tbody tr:nth-child(even){background:rgba(255,255,255,.03);}
+.dark-mode .stbl tbody tr:hover{background:rgba(96,165,250,.08);}
+.dark-mode .ai-inp,.dark-mode #sl-pwd{background:var(--bg);color:var(--text);border-color:var(--border);}
+.dark-mode .msg-ai .msg-bub{background:#1e2130;}
+.dark-mode .msg-you .msg-bub{background:rgba(96,165,250,.1);border-color:#3a3f55;}
+.dark-mode .chart-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.5);}
+.dark-mode .ai-notice{background:#3a2f08;border-color:#5e4a0e;color:#fde68a;}
+.dark-mode .ai-notice code{background:rgba(255,255,255,.08);}
+.dark-mode .chip{background:var(--bg);border-color:var(--border);}
+.dark-mode .opex-month-clear,.dark-mode #opex-month-filter{background:var(--bg);color:var(--text);border-color:var(--border);}
+.dark-mode .map-popup{background:var(--card);color:var(--text);}
+
+/* Dark-mode toggle */
+#dark-toggle{background:none;border:1px solid var(--border);border-radius:20px;
+  padding:4px 10px;font-size:14px;cursor:pointer;color:var(--dim);
+  transition:all .15s;white-space:nowrap;}
+#dark-toggle:hover{background:var(--bg);}
+
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:13px;}
+
+/* ── LOGIN SCREEN ── */
+#login-screen{display:none;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;padding:24px;background:var(--bg);}
+.login-card{background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:40px 36px;max-width:400px;width:100%;
+  box-shadow:0 8px 32px rgba(0,0,0,.10);text-align:center;}
+.login-logo{font-size:48px;margin-bottom:8px;}
+.login-title{font-size:22px;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--dim);margin-bottom:28px;}
+.login-field{width:100%;padding:11px 14px;font-size:14px;font-family:inherit;
+  border:1px solid var(--border);border-radius:6px;background:var(--input-bg);
+  color:var(--text);outline:none;transition:border .2s;margin-bottom:14px;}
+.login-field:focus{border-color:var(--blue);background:var(--card);}
+.login-submit{width:100%;padding:12px;font-size:15px;font-weight:700;
+  background:var(--blue);color:#fff;border:none;border-radius:6px;
+  cursor:pointer;transition:background .15s;margin-bottom:14px;}
+.login-submit:hover{background:var(--navy);}
+.login-submit:disabled{background:#aaa;cursor:not-allowed;}
+.login-remember{display:flex;align-items:center;gap:8px;font-size:12px;
+  color:var(--dim);cursor:pointer;justify-content:center;margin-bottom:10px;}
+.login-remember input{width:15px;height:15px;cursor:pointer;accent-color:var(--blue);}
+.login-error{color:var(--red);font-size:12px;font-weight:600;min-height:18px;margin-bottom:4px;}
+.login-spinner{display:none;font-size:12px;color:var(--dim);}
+.forgot-note{font-size:11px;color:var(--dim);margin-top:12px;line-height:1.5;}
+@media(max-width:480px){.login-card{padding:28px 20px;}}
+
+/* ── DASHBOARD (hidden until login) ── */
+#dashboard{display:none;}
 
 /* ── TOP BAR ── */
 .top-bar{background:var(--card);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow);}
@@ -62,21 +125,29 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 .info-bar strong{color:var(--accent);}
 .sdot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;}
 
-/* ── KPI CARDS ── */
+/* ── KPI CARDS (Pepsi style: left accent strip) ── */
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:12px 16px 4px;}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--card-r);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--shadow);transition:transform .15s;}
-.kpi-card:hover{transform:translateY(-2px);}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--card-r);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s;border-left:3px solid var(--blue)!important;position:relative;overflow:hidden;}
+.kpi-card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(15,28,46,.10);}
 .kpi-bar{width:3px;min-height:46px;border-radius:2px;flex-shrink:0;}
 .kpi-body{flex:1;min-width:0;}
 .kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
 .kpi-icon{font-size:18px;}
 .kpi-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;}
-.kpi-val{font-family:'DM Mono',monospace;font-size:clamp(14px,1.8vw,20px);font-weight:700;line-height:1.1;margin:2px 0;}
+.kpi-val{font-family:'DM Mono',monospace;font-size:clamp(14px,1.8vw,20px);font-weight:700;line-height:1.1;margin:2px 0;letter-spacing:-.3px;}
 .kpi-lbl{font-size:9px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;}
 .kpi-sub{font-size:10px;color:var(--dim);margin-top:2px;}
 .up{background:#d1fae5;color:#059669;}
 .down{background:#fee2e2;color:#dc2626;}
 .neutral{background:#f1f5f9;color:var(--dim);}
+.dark-mode .up{background:rgba(16,185,129,.15);color:#34d399;}
+.dark-mode .down{background:rgba(239,68,68,.15);color:#f87171;}
+.dark-mode .neutral{background:rgba(255,255,255,.05);color:var(--dim);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:fadeUp .35s ease-out both;}
+@keyframes tabIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+.tab-content.active{animation:tabIn .25s ease-out both;}
 
 /* ── TABS ── */
 .tab-bar{display:flex;gap:0;padding:0 16px;margin-top:8px;border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
@@ -164,6 +235,55 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 .ai-send{width:34px;height:34px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0;}
 .ai-send:disabled{opacity:.4;cursor:not-allowed;}
 
+/* ── CHART (scrollable variant for long time-series) ── */
+.chart-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
+.chart-scroll::-webkit-scrollbar{height:6px;}
+.chart-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+.chart-scroll::-webkit-scrollbar-thumb:hover{background:var(--dim);}
+.chart-scroll-inner{position:relative;height:100%;}
+.chart-hint{font-size:10px;color:var(--dim);margin-top:4px;text-align:center;display:none;}
+.chart-scroll.scrollable .chart-hint{display:block;}
+
+/* ── CONTENT SUB-LOCK ── */
+.sublock-wrap{position:relative;overflow:hidden;}
+.sublock-overlay{position:absolute;inset:0;z-index:50;background:var(--card);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;border-radius:var(--card-r);}
+.sublock-overlay.show{display:flex;}
+.sublock-overlay .sl-icon{font-size:28px;}
+.sublock-overlay .sl-msg{font-size:12px;color:var(--text);font-weight:600;text-align:center;padding:0 16px;}
+.sublock-overlay .sl-btn{padding:7px 20px;font-size:12px;font-weight:700;
+  background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;
+  border:none;border-radius:6px;cursor:pointer;}
+.sublock-overlay .sl-btn:hover{opacity:.88;}
+/* Compact variant for KPI cards (less vertical space) */
+.sublock-overlay.sl-kpi{gap:6px;}
+.sublock-overlay.sl-kpi .sl-icon{font-size:20px;}
+.sublock-overlay.sl-kpi .sl-btn{padding:4px 14px;font-size:11px;}
+#sl-modal{display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;}
+#sl-modal.open{display:flex;}
+#sl-modal-box{background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:28px 28px 20px;width:320px;max-width:92vw;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);}
+#sl-modal-box h3{font-size:15px;font-weight:700;color:var(--accent);margin:0 0 6px;}
+#sl-modal-box p{font-size:12px;color:var(--dim);margin:0 0 14px;}
+#sl-pwd{width:100%;padding:9px 12px;font-size:14px;font-family:inherit;
+  border:1px solid var(--border);border-radius:6px;background:var(--bg);
+  color:var(--text);box-sizing:border-box;margin-bottom:8px;}
+#sl-pwd:focus{outline:none;border-color:#667eea;}
+.sl-modal-btns{display:flex;gap:8px;justify-content:flex-end;}
+.sl-modal-btns button{padding:7px 18px;font-size:13px;font-weight:600;
+  border-radius:5px;cursor:pointer;border:1px solid transparent;}
+#sl-cancel{background:var(--bg);color:var(--dim);border-color:var(--border)!important;}
+#sl-confirm{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;}
+#sl-err{font-size:11px;color:var(--red);margin-bottom:6px;display:none;}
+
+/* Chart card hover */
+.chart-card{transition:box-shadow .2s,transform .2s;}
+.chart-card:hover{box-shadow:0 2px 8px rgba(15,28,46,.10),0 8px 28px rgba(15,28,46,.07);transform:translateY(-1px);}
+
 /* ── RESPONSIVE ── */
 @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr);}.g-32{grid-template-columns:1fr;}}
 @media(max-width:750px){
@@ -201,6 +321,50 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 </style>
 </head>
 <body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🔥</div>
+    <div class="login-title">Vikram HP Gas Agency</div>
+    <div class="login-sub">Business Dashboard — Authorised Access Only</div>
+    <div class="login-error" id="login-error"></div>
+    <input type="password" id="login-pwd" class="login-field"
+      placeholder="Enter password" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')submitLogin()">
+    <button class="login-submit" id="login-btn" onclick="submitLogin()">
+      Unlock Dashboard
+    </button>
+    <label class="login-remember">
+      <input type="checkbox" id="remember-device" checked>
+      Remember this device for 30 days
+    </label>
+    <div class="login-spinner" id="login-spinner">🔄 Verifying…</div>
+    <div class="forgot-note">
+      Password set by the account administrator.<br>
+      Contact them to reset access.
+    </div>
+  </div>
+</div>
+
+<!-- SUB-LOCK MODAL -->
+<div id="sl-modal">
+  <div id="sl-modal-box">
+    <h3 id="sl-title">🔒 Unlock Content</h3>
+    <p id="sl-desc">Enter the content password to view locked sections.</p>
+    <div id="sl-err"></div>
+    <input type="password" id="sl-pwd"
+      placeholder="Content password"
+      onkeydown="if(event.key==='Enter')confirmSubLock()">
+    <div class="sl-modal-btns">
+      <button id="sl-cancel" onclick="closeSubLockModal()">Cancel</button>
+      <button id="sl-confirm" onclick="confirmSubLock()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
 
 <!-- TOP BAR -->
 <div class="top-bar">
@@ -257,6 +421,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
     <button class="btn btn-outline" onclick="resetFilters()">↺ Reset</button>
   </div>
   <div style="display:flex;align-items:center;gap:6px;margin-left:6px;">
+    <button class="btn btn-outline" onclick="openSubLockSetup()" title="Lock content on this device" style="padding:5px 10px;">🔒</button>
+    <button id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
     <button class="btn btn-purple" onclick="openAI()">✨ Ask AI</button>
   </div>
 </div>
@@ -270,9 +436,10 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 </div>
 
 <!-- KPI CARDS -->
-<div class="kpi-row">
-  <div class="kpi-card">
-    <div class="kpi-bar" style="background:#2563eb;"></div>
+<div class="kpi-row fade-in" id="kpi-row">
+  <div class="kpi-card sublock-wrap">
+    <div class="sublock-overlay sl-kpi" id="sl-kpi-revenue"><div class="sl-icon">🔒</div><button class="sl-btn" onclick="openSubLock()">Unlock</button></div>
+    <div class="kpi-bar" style="background:var(--blue);"></div>
     <div class="kpi-body">
       <div class="kpi-top"><span class="kpi-icon">💰</span><span class="kpi-badge up">+12% YoY</span></div>
       <div class="kpi-val" id="kpi-revenue">—</div>
@@ -280,8 +447,9 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
       <div class="kpi-sub">All products combined</div>
     </div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-bar" style="background:#10b981;"></div>
+  <div class="kpi-card sublock-wrap">
+    <div class="sublock-overlay sl-kpi" id="sl-kpi-profit"><div class="sl-icon">🔒</div><button class="sl-btn" onclick="openSubLock()">Unlock</button></div>
+    <div class="kpi-bar" style="background:var(--green);"></div>
     <div class="kpi-body">
       <div class="kpi-top"><span class="kpi-icon">📈</span><span class="kpi-badge up" id="kpi-gm-badge">Gross profit</span></div>
       <div class="kpi-val" id="kpi-profit">—</div>
@@ -290,7 +458,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
     </div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-bar" style="background:#ef4444;"></div>
+    <div class="kpi-bar" style="background:var(--red);"></div>
     <div class="kpi-body">
       <div class="kpi-top"><span class="kpi-icon">💳</span><span class="kpi-badge down" id="kpi-recv-badge">of sale</span></div>
       <div class="kpi-val" id="kpi-recv">—</div>
@@ -299,7 +467,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
     </div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-bar" style="background:#f59e0b;"></div>
+    <div class="kpi-bar" style="background:var(--orange);"></div>
     <div class="kpi-body">
       <div class="kpi-top"><span class="kpi-icon">🛢️</span><span class="kpi-badge neutral">in hand</span></div>
       <div class="kpi-val" id="kpi-stock">—</div>
@@ -308,7 +476,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
     </div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-bar" style="background:#7c3aed;"></div>
+    <div class="kpi-bar" style="background:var(--purple);"></div>
     <div class="kpi-body">
       <div class="kpi-top"><span class="kpi-icon">🛒</span><span class="kpi-badge neutral">all types</span></div>
       <div class="kpi-val" id="kpi-purchases">—</div>
@@ -329,12 +497,16 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 </div>
 
 <!-- ═══ TAB: OVERVIEW ═══ -->
-<div class="tab-content active" id="tab-overview">
+<div class="tab-content active sublock-wrap" id="tab-overview">
+  <div class="sublock-overlay" id="sl-tab-overview"><div class="sl-icon">🔒</div><div class="sl-msg">This section is locked</div><button class="sl-btn" onclick="openSubLock()">Unlock</button></div>
   <div class="content">
     <div class="chart-grid g-1" style="margin-bottom:12px;">
       <div class="chart-card">
         <div class="chart-title" id="main-ct">Full Cylinders Given — by Year and Month <span class="chart-sub" id="main-cs">Monthly trend</span></div>
-        <div class="chart-wrap" style="height:240px;"><canvas id="c-monthly"></canvas></div>
+        <div class="chart-scroll" id="c-monthly-scroll" style="height:240px;">
+          <div class="chart-scroll-inner" id="c-monthly-inner" style="height:100%;"><canvas id="c-monthly"></canvas></div>
+        </div>
+        <div class="chart-hint">⇆ scroll horizontally to view all months</div>
       </div>
     </div>
     <div class="chart-grid g-32">
@@ -365,18 +537,22 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 </div>
 
 <!-- ═══ TAB: SALES ═══ -->
-<div class="tab-content" id="tab-sales">
+<div class="tab-content sublock-wrap" id="tab-sales">
+  <div class="sublock-overlay" id="sl-tab-sales"><div class="sl-icon">🔒</div><div class="sl-msg">This section is locked</div><button class="sl-btn" onclick="openSubLock()">Unlock</button></div>
   <div class="content">
     <div class="chart-grid g-2" style="margin-bottom:12px;">
       <div class="chart-card">
         <div class="chart-title">
           Monthly Billing vs Collections
           <div style="display:flex;gap:10px;margin-left:auto;">
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:400;color:var(--dim);"><span style="width:9px;height:9px;border-radius:2px;background:#2563eb;display:inline-block;"></span>Billing</span>
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:400;color:var(--dim);"><span style="width:9px;height:9px;border-radius:2px;background:#f59e0b;display:inline-block;"></span>Collected</span>
+            <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:400;color:var(--dim);"><span style="width:9px;height:9px;border-radius:2px;background:var(--blue);display:inline-block;"></span>Billing</span>
+            <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:400;color:var(--dim);"><span style="width:9px;height:9px;border-radius:2px;background:var(--orange);display:inline-block;"></span>Collected</span>
           </div>
         </div>
-        <div class="chart-wrap" style="height:240px;"><canvas id="c-bvc"></canvas></div>
+        <div class="chart-scroll" id="c-bvc-scroll" style="height:240px;">
+          <div class="chart-scroll-inner" id="c-bvc-inner" style="height:100%;"><canvas id="c-bvc"></canvas></div>
+        </div>
+        <div class="chart-hint">⇆ scroll horizontally to view all months</div>
       </div>
       <div class="chart-card">
         <div class="chart-title">Payment Mode Split</div>
@@ -405,7 +581,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 </div>
 
 <!-- ═══ TAB: OPEX ═══ -->
-<div class="tab-content" id="tab-opex">
+<div class="tab-content sublock-wrap" id="tab-opex">
+  <div class="sublock-overlay" id="sl-tab-opex"><div class="sl-icon">🔒</div><div class="sl-msg">This section is locked</div><button class="sl-btn" onclick="openSubLock()">Unlock</button></div>
   <div class="content">
     <div class="opex-kpis">
       <div class="opex-kpi"><div class="olbl">Total Expenses</div><div class="oval" id="opex-total">—</div></div>
@@ -500,14 +677,16 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
       </div>
       <div id="cmap"></div>
       <div class="map-legend">
-        <div class="leg-item"><div class="leg-dot" style="background:#2563eb;"></div>Low receivable</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#f59e0b;"></div>Medium (&gt;₹20K)</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#ef4444;"></div>High (&gt;₹1L)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--blue);"></div>Low receivable</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--orange);"></div>Medium (&gt;₹20K)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--red);"></div>High (&gt;₹1L)</div>
         <div style="margin-left:auto;font-size:10px;color:var(--dim);">Circle size ∝ cylinders sold</div>
       </div>
     </div>
   </div>
 </div>
+
+</div><!-- /#dashboard -->
 
 <!-- AI OVERLAY + SIDEBAR -->
 <div class="ai-ov" id="ai-ov" onclick="closeAI()"></div>
@@ -552,6 +731,181 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 <script>
 'use strict';
 
+// ════════════════════════════════════════════════════════
+//  LOGIN  (password from auth.json on GitHub)
+// ════════════════════════════════════════════════════════
+const AUTH_KEY     = 'gas_auth_token';
+const AUTH_EXPIRY  = 'gas_auth_expiry';
+const REMEMBER_DAYS= 30;
+const AUTH_URL     = './auth.json';
+let   _authData    = null;
+
+async function sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function loadStoredHash(){
+  try{
+    const r=await fetch(AUTH_URL+'?_='+Date.now());
+    if(!r.ok) return null;
+    _authData=await r.json();
+    const pwH=_authData.password_sha256||'';
+    const ctH=_authData.content_sha256||'';
+    // If password changed since last visit, force re-login
+    const newPwFP=pwH.slice(0,12), newCtFP=ctH.slice(0,12);
+    const oldPwFP=localStorage.getItem('gas_pw_fp');
+    const oldCtFP=localStorage.getItem('gas_ct_fp');
+    if(oldPwFP&&oldPwFP!==newPwFP){ forgetDevice(); localStorage.removeItem('gas_pw_fp'); }
+    if(oldCtFP&&oldCtFP!==newCtFP){
+      localStorage.removeItem('gas_content_unlocked');
+      sessionStorage.removeItem('gas_subunlocked');
+      localStorage.removeItem('gas_ct_fp');
+    }
+    if(newPwFP) localStorage.setItem('gas_pw_fp',newPwFP);
+    if(newCtFP) localStorage.setItem('gas_ct_fp',newCtFP);
+    return pwH||null;
+  }catch(e){ return null; }
+}
+
+function isRemembered(){
+  const token=localStorage.getItem(AUTH_KEY);
+  const expiry=parseInt(localStorage.getItem(AUTH_EXPIRY)||'0',10);
+  return token==='gas_authenticated' && Date.now()<expiry;
+}
+function rememberDevice(){
+  localStorage.setItem(AUTH_KEY,'gas_authenticated');
+  localStorage.setItem(AUTH_EXPIRY,String(Date.now()+REMEMBER_DAYS*24*60*60*1000));
+}
+function forgetDevice(){
+  localStorage.removeItem(AUTH_KEY);
+  localStorage.removeItem(AUTH_EXPIRY);
+}
+
+async function submitLogin(){
+  const pwd=document.getElementById('login-pwd').value;
+  if(!pwd){ document.getElementById('login-error').textContent='Please enter a password.'; return; }
+  const btn=document.getElementById('login-btn');
+  const spin=document.getElementById('login-spinner');
+  btn.disabled=true; spin.style.display='block';
+  document.getElementById('login-error').textContent='';
+
+  const storedHash=await loadStoredHash();
+  if(!storedHash){
+    document.getElementById('login-error').textContent='⚠️ Auth file not found. Contact the administrator.';
+    btn.disabled=false; spin.style.display='none';
+    return;
+  }
+  const entered=await sha256(pwd);
+  if(entered===storedHash){
+    if(document.getElementById('remember-device').checked) rememberDevice();
+    showDashboardAfterLogin();
+  }else{
+    document.getElementById('login-error').textContent='❌ Incorrect password. Try again.';
+    document.getElementById('login-pwd').value='';
+    document.getElementById('login-pwd').focus();
+    btn.disabled=false; spin.style.display='none';
+  }
+}
+
+function showDashboardAfterLogin(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  bootDashboard();
+}
+
+// ════════════════════════════════════════════════════════
+//  DARK MODE
+// ════════════════════════════════════════════════════════
+function toggleDark(){
+  const isDark=document.body.classList.toggle('dark-mode');
+  localStorage.setItem('gas_dark_mode', isDark?'1':'0');
+  const btn=document.getElementById('dark-toggle');
+  if(btn) btn.textContent=isDark?'☀️':'🌙';
+  // Refresh charts: destroy + rebuild so axes/series adopt new theme colors
+  setChartDefaults();
+  destroyAllCharts();
+  if(typeof applyFilters==='function' && D) applyFilters();
+}
+(function(){
+  if(localStorage.getItem('gas_dark_mode')==='1'){
+    document.body.classList.add('dark-mode');
+  }
+})();
+
+// ════════════════════════════════════════════════════════
+//  CONTENT SUB-LOCK
+// ════════════════════════════════════════════════════════
+const _SL_OVERLAY_IDS=['sl-tab-overview','sl-tab-sales','sl-tab-opex','sl-kpi-revenue','sl-kpi-profit'];
+const _SL_LOCAL_KEY='gas_content_unlocked';
+
+function _applySubLocks(){
+  const ok = localStorage.getItem(_SL_LOCAL_KEY)==='1'
+          || sessionStorage.getItem('gas_subunlocked')==='1';
+  _SL_OVERLAY_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('show', !ok);
+  });
+}
+
+function openSubLock(){
+  document.getElementById('sl-title').textContent='🔒 Unlock Content';
+  document.getElementById('sl-desc').textContent='Enter the content password to view locked sections.';
+  document.getElementById('sl-err').style.display='none';
+  document.getElementById('sl-pwd').value='';
+  document.getElementById('sl-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('sl-pwd').focus(),80);
+}
+function openSubLockSetup(){
+  // Re-lock content on this device
+  localStorage.removeItem(_SL_LOCAL_KEY);
+  sessionStorage.removeItem('gas_subunlocked');
+  _applySubLocks();
+}
+function closeSubLockModal(){ document.getElementById('sl-modal').classList.remove('open'); }
+
+async function confirmSubLock(){
+  const pwd=document.getElementById('sl-pwd').value;
+  if(!pwd) return;
+  const hash=await sha256(pwd);
+  if(!_authData){ await loadStoredHash(); }
+  const contentHash=_authData && _authData.content_sha256;
+  if(!contentHash){
+    const err=document.getElementById('sl-err');
+    err.textContent='No content password set in auth.json. Add content_sha256 field.';
+    err.style.display='block';
+    return;
+  }
+  if(hash===contentHash){
+    localStorage.setItem(_SL_LOCAL_KEY,'1');
+    sessionStorage.setItem('gas_subunlocked','1');
+    _applySubLocks();
+    closeSubLockModal();
+  }else{
+    const err=document.getElementById('sl-err');
+    err.textContent='Incorrect password. Try again.';
+    err.style.display='block';
+    document.getElementById('sl-pwd').value='';
+    document.getElementById('sl-pwd').focus();
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  ENTRY POINT
+// ════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async ()=>{
+  // Set dark-mode button label after DOM is ready
+  const dbtn=document.getElementById('dark-toggle');
+  if(dbtn) dbtn.textContent = document.body.classList.contains('dark-mode')?'☀️':'🌙';
+
+  if(isRemembered()){
+    await loadStoredHash();           // refresh in case password rotated
+    if(isRemembered()){ showDashboardAfterLogin(); return; }
+  }
+  document.getElementById('login-screen').style.display='flex';
+  setTimeout(()=>document.getElementById('login-pwd').focus(),100);
+});
+
 // ── Global data ──────────────────────────────────────────────
 let D = null;
 
@@ -560,6 +914,13 @@ const inr  = n => '₹' + Math.round(n).toLocaleString('en-IN');
 const inrL = n => { const l=n/100000; return '₹'+(l>=100?(l/100).toFixed(1)+'Cr':l.toFixed(1)+'L'); };
 const MON_IDX = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
 function mlToDate(label){const[m,y]=label.split('-');return new Date(2000+parseInt(y),MON_IDX[m]||0,1);}
+// FIX: parse YYYY-MM-DD as local-time midnight (avoids UTC->IST timezone bug
+// that previously dropped Feb-24 from default filter)
+function parseLocalDate(s){
+  if(!s) return null;
+  const [y,m,d]=s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
 
 // ── Chart instances ──────────────────────────────────────────
 let cMonthly,cLoc,cBvc,cPay,cOpex,cRpct;
@@ -567,8 +928,23 @@ let cMonthly,cLoc,cBvc,cPay,cOpex,cRpct;
 // ── Chart defaults ────────────────────────────────────────────
 function setChartDefaults(){
   if(typeof Chart==='undefined') return;
+  const isDark=document.body.classList.contains('dark-mode');
   Chart.defaults.font={family:"'Plus Jakarta Sans',system-ui,sans-serif",size:11};
-  Chart.defaults.color='#7a8ca0';
+  Chart.defaults.color = isDark ? '#9aa8bc' : '#7a8ca0';
+}
+
+// Read a CSS variable from :root — returns the resolved colour string.
+// Charts use these instead of hardcoded hex so dark mode applies cleanly.
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+function gridColor(){ return cssVar('--gridline'); }
+
+// Destroy all chart instances. Call this when the theme changes so the
+// next render picks up fresh gridline/text/series colours.
+function destroyAllCharts(){
+  [cMonthly,cLoc,cBvc,cPay,cOpex,cRpct].forEach(c=>{ try{ c&&c.destroy(); }catch(e){} });
+  cMonthly=cLoc=cBvc=cPay=cOpex=cRpct=undefined;
 }
 
 // ── Mobile filter toggle ──────────────────────────────────────
@@ -870,6 +1246,25 @@ function metricData(monthly,metric){
 function yFmt(metric){ return metric==='cylinders'?v=>Math.round(v).toLocaleString():v=>inrL(v); }
 function ttFmt(metric){ return metric==='cylinders'?c=>Math.round(c.parsed.y).toLocaleString()+' cyl':c=>inr(c.parsed.y); }
 
+// Resize the inner wrapper of a horizontally-scrollable chart so each month
+// gets `pxPerMonth` of width. If the natural container is wider, fall back to
+// 100% (no scroll needed). Adds .scrollable on the outer wrapper when the
+// content overflows so the "⇆ scroll" hint becomes visible.
+function _setupScrollChart(outerId, innerId, monthCount, pxPerMonth){
+  const outer=document.getElementById(outerId);
+  const inner=document.getElementById(innerId);
+  if(!outer||!inner) return;
+  const needed = Math.max(0, monthCount) * pxPerMonth;
+  const avail  = outer.clientWidth;
+  if(needed > avail){
+    inner.style.width = needed + 'px';
+    outer.classList.add('scrollable');
+  } else {
+    inner.style.width = '100%';
+    outer.classList.remove('scrollable');
+  }
+}
+
 function renderCharts(monthly,locSales,opexCats,payMode){
   const metric=document.getElementById('metric-sel').value;
   const gran=document.getElementById('granularity').value;
@@ -880,9 +1275,24 @@ function renderCharts(monthly,locSales,opexCats,payMode){
   const cs=document.getElementById('main-cs');
   if(cs) cs.textContent=`${GRAN_LABEL[gran]||''} trend · ${first} – ${last}`;
 
+  // Read theme colours once per render (cheap, just reads CSS vars)
+  const cBlue   = cssVar('--blue')   || '#2563eb';
+  const cGreen  = cssVar('--green')  || '#10b981';
+  const cOrange = cssVar('--orange') || '#f59e0b';
+  const cRed    = cssVar('--red')    || '#ef4444';
+  const cPurple = cssVar('--purple') || '#8b5cf6';
+  const cTeal   = cssVar('--teal')   || '#06b6d4';
+  const cGrid   = gridColor();
+
+  // ── Main monthly chart (scrollable) ─────────────────────────
   const mLabels=monthly.map(m=>m.month);
   const mData=metricData(monthly,metric);
-  const mColors=monthly.map(m=>m.month.includes('26')?'#1d4ed8':m.month.includes('25')?'#60a5fa':'#bfdbfe');
+  // Year-tinted bars — newest year strongest. Uses blue series for both themes.
+  const mColors=monthly.map(m=>m.month.includes('26')?cBlue:m.month.includes('25')?cBlue+'aa':cBlue+'55');
+
+  // Size the scrollable wrapper BEFORE creating/updating the chart so it
+  // lays out at the correct width.
+  _setupScrollChart('c-monthly-scroll','c-monthly-inner', mLabels.length, 60);
 
   if(cMonthly){
     cMonthly.data.labels=mLabels;
@@ -890,6 +1300,8 @@ function renderCharts(monthly,locSales,opexCats,payMode){
     cMonthly.data.datasets[0].backgroundColor=mColors;
     cMonthly.options.plugins.tooltip.callbacks.label=ttFmt(metric);
     cMonthly.options.scales.y.ticks={callback:yFmt(metric)};
+    cMonthly.options.scales.y.grid.color=cGrid;
+    cMonthly.resize();
     cMonthly.update();
   } else {
     cMonthly=new Chart(document.getElementById('c-monthly'),{
@@ -897,17 +1309,20 @@ function renderCharts(monthly,locSales,opexCats,payMode){
       data:{labels:mLabels,datasets:[{label:METRIC_TITLE[metric],data:mData,backgroundColor:mColors,borderRadius:4,borderSkipped:false}]},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:false},tooltip:{callbacks:{label:ttFmt(metric)}}},
-        scales:{x:{grid:{display:false},ticks:{autoSkip:true,maxRotation:45,maxTicksLimit:20}},y:{grid:{color:'#f1f5f9'},beginAtZero:true,ticks:{callback:yFmt(metric)}}}}
+        // autoSkip OFF so every month label is shown when the user scrolls
+        scales:{x:{grid:{display:false},ticks:{autoSkip:false,maxRotation:45}},
+                y:{grid:{color:cGrid},beginAtZero:true,ticks:{callback:yFmt(metric)}}}}
     });
   }
 
-  // Location bar
+  // ── Location bar ────────────────────────────────────────────
   const selLocs=getSelectedCD('location');
-  const locColors=(locSales||[]).map(l=>!selLocs||selLocs.includes(l.location)?'#2563eb':'#bfdbfe');
+  const locColors=(locSales||[]).map(l=>!selLocs||selLocs.includes(l.location)?cBlue:cBlue+'55');
   if(cLoc){
     cLoc.data.labels=(locSales||[]).map(l=>l.location);
     cLoc.data.datasets[0].data=(locSales||[]).map(l=>l.cylinders);
     cLoc.data.datasets[0].backgroundColor=locColors;
+    cLoc.options.scales.x.grid.color=cGrid;
     cLoc.update();
   } else {
     cLoc=new Chart(document.getElementById('c-loc'),{
@@ -915,49 +1330,62 @@ function renderCharts(monthly,locSales,opexCats,payMode){
       data:{labels:(locSales||[]).map(l=>l.location),datasets:[{data:(locSales||[]).map(l=>l.cylinders),backgroundColor:locColors,borderRadius:3}]},
       options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${Math.round(c.parsed.x).toLocaleString()} cylinders`}}},
-        scales:{x:{grid:{color:'#f1f5f9'},beginAtZero:true},y:{grid:{display:false}}}}
+        scales:{x:{grid:{color:cGrid},beginAtZero:true},y:{grid:{display:false}}}}
     });
   }
 
-  // Billing vs collections
-  const bSlice=monthly.slice(-12);
+  // ── Billing vs Collections (scrollable, shows ALL months) ───
+  const bAll=monthly; // FIX: was monthly.slice(-12) — now shows everything
+  _setupScrollChart('c-bvc-scroll','c-bvc-inner', bAll.length, 90);
   if(cBvc){
-    cBvc.data.labels=bSlice.map(m=>m.month);
-    cBvc.data.datasets[0].data=bSlice.map(m=>m.billing);
-    cBvc.data.datasets[1].data=bSlice.map(m=>m.collected);
+    cBvc.data.labels=bAll.map(m=>m.month);
+    cBvc.data.datasets[0].data=bAll.map(m=>m.billing);
+    cBvc.data.datasets[0].backgroundColor=cBlue;
+    cBvc.data.datasets[1].data=bAll.map(m=>m.collected);
+    cBvc.data.datasets[1].backgroundColor=cOrange;
+    cBvc.options.scales.y.grid.color=cGrid;
+    cBvc.resize();
     cBvc.update();
   } else {
     cBvc=new Chart(document.getElementById('c-bvc'),{
       type:'bar',
-      data:{labels:bSlice.map(m=>m.month),datasets:[
-        {label:'Billing',data:bSlice.map(m=>m.billing),backgroundColor:'#2563eb',borderRadius:3},
-        {label:'Collected',data:bSlice.map(m=>m.collected),backgroundColor:'#f59e0b',borderRadius:3}
+      data:{labels:bAll.map(m=>m.month),datasets:[
+        {label:'Billing',  data:bAll.map(m=>m.billing),  backgroundColor:cBlue,  borderRadius:3},
+        {label:'Collected',data:bAll.map(m=>m.collected),backgroundColor:cOrange,borderRadius:3}
       ]},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${inr(c.parsed.y)}`}}},
-        scales:{x:{grid:{display:false},ticks:{maxRotation:45}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>inrL(v)}}}}
+        scales:{x:{grid:{display:false},ticks:{autoSkip:false,maxRotation:45}},
+                y:{grid:{color:cGrid},ticks:{callback:v=>inrL(v)}}}}
     });
   }
 
-  // Payment mode
+  // ── Payment mode doughnut ───────────────────────────────────
   const pmData=[payMode.cash||0,payMode.online||0,payMode.both||0];
-  if(cPay){cPay.data.datasets[0].data=pmData;cPay.update();}
-  else {
+  if(cPay){
+    cPay.data.datasets[0].data=pmData;
+    cPay.data.datasets[0].backgroundColor=[cBlue,cOrange,cGreen];
+    cPay.update();
+  } else {
     cPay=new Chart(document.getElementById('c-pay'),{
       type:'doughnut',
-      data:{labels:['Cash','Online','Both'],datasets:[{data:pmData,backgroundColor:['#2563eb','#f59e0b','#10b981'],borderWidth:0,hoverOffset:8}]},
+      data:{labels:['Cash','Online','Both'],datasets:[{data:pmData,backgroundColor:[cBlue,cOrange,cGreen],borderWidth:0,hoverOffset:8}]},
       options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
         plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'rect',boxWidth:10,padding:12}},
         tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed.toLocaleString()} txns`}}}}
     });
   }
 
-  // OpEx donut
-  const OC=['#2563eb','#f59e0b','#10b981','#8b5cf6','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#a78bfa','#34d399'];
+  // ── OpEx donut ──────────────────────────────────────────────
+  const OC=[cBlue,cOrange,cGreen,cPurple,cRed,cTeal,'#ec4899','#84cc16','#f97316','#a78bfa','#34d399'];
   const leg=document.getElementById('opex-leg');
   leg.innerHTML=opexCats.map((c,i)=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--dim)"><span style="width:8px;height:8px;border-radius:2px;background:${OC[i%OC.length]};display:inline-block;flex-shrink:0"></span>${c.category} ${c.pct}%</span>`).join('');
-  if(cOpex){cOpex.data.labels=opexCats.map(c=>c.category);cOpex.data.datasets[0].data=opexCats.map(c=>c.total);cOpex.update();}
-  else {
+  if(cOpex){
+    cOpex.data.labels=opexCats.map(c=>c.category);
+    cOpex.data.datasets[0].data=opexCats.map(c=>c.total);
+    cOpex.data.datasets[0].backgroundColor=OC;
+    cOpex.update();
+  } else {
     cOpex=new Chart(document.getElementById('c-opex'),{
       type:'doughnut',
       data:{labels:opexCats.map(c=>c.category),datasets:[{data:opexCats.map(c=>c.total),backgroundColor:OC,borderWidth:0,hoverOffset:8}]},
@@ -966,12 +1394,16 @@ function renderCharts(monthly,locSales,opexCats,payMode){
     });
   }
 
+  // ── Receivables % gauge ─────────────────────────────────────
   if(!cRpct){
     cRpct=new Chart(document.getElementById('c-rpct'),{
       type:'doughnut',
-      data:{labels:['Outstanding','Collected'],datasets:[{data:[2,98],backgroundColor:['#f59e0b','#e2e8f0'],borderWidth:0}]},
+      data:{labels:['Outstanding','Collected'],datasets:[{data:[2,98],backgroundColor:[cOrange, cGrid || '#e2e8f0'],borderWidth:0}]},
       options:{responsive:true,maintainAspectRatio:false,circumference:180,rotation:-90,cutout:'75%',plugins:{legend:{display:false},tooltip:{enabled:false}}}
     });
+  } else {
+    cRpct.data.datasets[0].backgroundColor=[cOrange, cGrid || '#e2e8f0'];
+    cRpct.update();
   }
 }
 
@@ -981,6 +1413,10 @@ function renderCharts(monthly,locSales,opexCats,payMode){
 let mapReady=false;
 function initMap(){
   mapReady=true;
+  const cBlue=cssVar('--blue')||'#2563eb',
+        cOrange=cssVar('--orange')||'#f59e0b',
+        cRed=cssVar('--red')||'#ef4444',
+        cGreen=cssVar('--green')||'#10b981';
   const map=L.map('cmap').setView([15.75,73.70],10);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18
@@ -988,7 +1424,7 @@ function initMap(){
   (D.map_points||[]).forEach(p=>{
     const cy=p.cylinders||0,recv=p.receivable||0;
     const radius=p.type==='location_cluster'?Math.max(9,Math.min(36,cy/120)):7;
-    const color=recv>100000?'#ef4444':recv>20000?'#f59e0b':'#2563eb';
+    const color=recv>100000?cRed:recv>20000?cOrange:cBlue;
     L.circleMarker([p.lat,p.lng],{radius,fillColor:color,color:'#fff',weight:2,opacity:1,fillOpacity:.82})
     .addTo(map)
     .bindPopup(`<div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:160px;font-size:12px">
@@ -996,7 +1432,7 @@ function initMap(){
       <span style="color:#7a8ca0">${p.location}</span>
       <div style="margin-top:7px">
         ${cy?`<div>🛢️ <strong>${cy.toLocaleString()}</strong> cyl sold</div>`:''}
-        <div style="color:${recv>50000?'#ef4444':'#10b981'}">💳 ${inr(recv)} receivable</div>
+        <div style="color:${recv>50000?cRed:cGreen}">💳 ${inr(recv)} receivable</div>
       </div>
     </div>`,{closeButton:false});
   });
@@ -1011,8 +1447,10 @@ function applyFilters(){
   const toVal=document.getElementById('d-to').value;
   const gran=document.getElementById('granularity').value;
   const metric=document.getElementById('metric-sel').value;
-  const fromDate=fromVal?new Date(fromVal):null;
-  const toDate=toVal?new Date(toVal):null;
+  // FIX: parse dates in local time so they line up with mlToDate(month)
+  // (was: new Date('2024-02-01') → UTC midnight → IST 05:30 → cut off Feb-24)
+  const fromDate=parseLocalDate(fromVal);
+  const toDate=parseLocalDate(toVal);
   const selLocs=getSelectedCD('location');
   const selCusts=getSelectedCD('customer');
 
@@ -1069,7 +1507,7 @@ function applyFilters(){
   // Recompute OpEx cards from date-filtered opex_log
   const filteredOpex=(D.opex_log||[]).filter(e=>{
     if(!e.date) return true;
-    const d=new Date(e.date);
+    const d=parseLocalDate(e.date);
     if(fromDate&&d<fromDate) return false;
     if(toDate&&d>toDate) return false;
     return true;
@@ -1115,22 +1553,35 @@ function initDashboard(data){
   if(D.meta.data_upto) document.getElementById('d-to').value=D.meta.data_upto;
 
   initCDs();
-
   renderOpexTable();
-
   applyFilters();
+  // Apply the lock state to KPI cards + tab overlays now that they exist.
+  _applySubLocks();
+
+  // Re-size scrollable charts whenever the viewport changes
+  let _rs;
+  window.addEventListener('resize',()=>{
+    clearTimeout(_rs);
+    _rs=setTimeout(()=>{ if(D) applyFilters(); },150);
+  });
 }
 
 // ════════════════════════════════════════════════════════
-//  FETCH
+//  FETCH  (called from showDashboardAfterLogin → bootDashboard)
 // ════════════════════════════════════════════════════════
-fetch('./data/gas_data.json')
-  .then(r=>{if(!r.ok) throw new Error('HTTP '+r.status);return r.json();})
-  .then(data=>initDashboard(data))
-  .catch(err=>{
-    document.getElementById('s-stat').textContent='⚠️ Could not load gas_data.json — '+err.message;
-    console.error(err);
-  });
+let _booted=false;
+function bootDashboard(){
+  if(_booted) return;
+  _booted=true;
+  fetch('./data/gas_data.json?_='+Date.now(),{cache:'no-store'})
+    .then(r=>{if(!r.ok) throw new Error('HTTP '+r.status);return r.json();})
+    .then(data=>initDashboard(data))
+    .catch(err=>{
+      const el=document.getElementById('s-stat');
+      if(el) el.textContent='⚠️ Could not load gas_data.json — '+err.message;
+      console.error(err);
+    });
+}
 
 // ════════════════════════════════════════════════════════
 //  AI SIDEBAR
