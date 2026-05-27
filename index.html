@@ -161,11 +161,14 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 
 /* ── LAYOUT ── */
 .content{padding:12px 16px 20px;}
-.chart-grid{display:grid;gap:12px;margin-bottom:12px;}
+.chart-grid{display:grid;gap:12px;margin-bottom:12px;min-width:0;}
 .g-2{grid-template-columns:1fr 1fr;}
 .g-32{grid-template-columns:2fr 1fr;}
 .g-1{grid-template-columns:1fr;}
-.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--card-r);padding:14px;box-shadow:var(--shadow);}
+/* min-width:0 lets a grid item shrink below its content's intrinsic width,
+   which is what lets .chart-scroll's overflow-x:auto actually engage on
+   horizontally-overflowing charts instead of expanding the whole card. */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--card-r);padding:14px;box-shadow:var(--shadow);min-width:0;overflow:hidden;}
 .chart-title{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
 .chart-sub{font-size:11px;font-weight:400;color:var(--dim);}
 .chart-wrap{position:relative;width:100%;}
@@ -236,7 +239,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 .ai-send:disabled{opacity:.4;cursor:not-allowed;}
 
 /* ── CHART (scrollable variant for long time-series) ── */
-.chart-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
+.chart-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;max-width:100%;width:100%;}
 .chart-scroll::-webkit-scrollbar{height:6px;}
 .chart-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
 .chart-scroll::-webkit-scrollbar-thumb:hover{background:var(--dim);}
@@ -962,6 +965,25 @@ function switchTab(id,btn){
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
   if(id==='map'&&!mapReady) initMap();
+  // Scrollable charts that were first laid out while their tab was hidden
+  // measured against clientWidth=0. Re-run the size pass + Chart.js resize
+  // now that the tab is visible so the scroll math is correct.
+  requestAnimationFrame(()=>{
+    if(id==='overview'){
+      if(D && cMonthly){
+        const months=(cMonthly.data.labels||[]).length;
+        _setupScrollChart('c-monthly-scroll','c-monthly-inner', months, 60);
+        cMonthly.resize();
+      }
+    } else if(id==='sales'){
+      if(D && cBvc){
+        const months=(cBvc.data.labels||[]).length;
+        _setupScrollChart('c-bvc-scroll','c-bvc-inner', months, 72);
+        cBvc.resize();
+      }
+      cPay && cPay.resize();
+    }
+  });
 }
 
 // ════════════════════════════════════════════════════════
@@ -1336,7 +1358,7 @@ function renderCharts(monthly,locSales,opexCats,payMode){
 
   // ── Billing vs Collections (scrollable, shows ALL months) ───
   const bAll=monthly; // FIX: was monthly.slice(-12) — now shows everything
-  _setupScrollChart('c-bvc-scroll','c-bvc-inner', bAll.length, 90);
+  _setupScrollChart('c-bvc-scroll','c-bvc-inner', bAll.length, 72);
   if(cBvc){
     cBvc.data.labels=bAll.map(m=>m.month);
     cBvc.data.datasets[0].data=bAll.map(m=>m.billing);
